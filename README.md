@@ -24,7 +24,7 @@ yarn install
 
 ```
 
-# Quick Start tests
+# Quick Start tests (TODO)
 
 ```
 yarn start-sandbox
@@ -48,8 +48,33 @@ yarn stop-sandbox
 # Compile contract
 
 ```
-yarn compile
+yarn compile router
 
+```
+
+# Compile bytes
+
+Compile parser contract
+
+```sh
+yarn compile-parser ${parserName}
+```
+
+ex. 
+
+```sh 
+yarn compile-parser harbinger
+```
+
+Compile and prepare parser bytes
+
+```sh 
+yarn parser-to-bytes ${parserName}
+```
+
+ex. 
+```sh
+yarn parser-to-bytes harbinger
 ```
 
 # Deploy contract
@@ -58,12 +83,3 @@ yarn compile
 yarn migrate
 
 ```
-
-
-
-Compile parser contract
-```sh yarn compile-parser ${parserName}```
-ex. ```sh yarn compile-parser harbinger```
-Compile and prepare parser bytes
-```sh yarn parser-to-bytes ${parserName}```
-ex. ```sh yarn parser-to-bytes harbinger```
