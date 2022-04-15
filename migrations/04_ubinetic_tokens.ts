@@ -2,7 +2,7 @@ import { TezosToolkit } from "@taquito/taquito";
 import { NetworkLiteral, TezosAddress } from "../utils/helpers";
 import router from "../build/router.json"
 import { confirmOperation } from "../utils/confirmation";
-import tokens from "../storage/harbinger_tokens.json";
+import tokens from "../storage/ubinetic_tokens.json";
 
 
 module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
@@ -17,10 +17,10 @@ module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
         tokenId,
         assetName,
         decimals,
-        oracle: process.env.HARBINGER_ORACLE,
+        oracle: process.env.UBINETIC_ORACLE,
       }));
   }
   const op = await batch.send();
   await confirmOperation(tezos, op.hash);
-  console.log(`Tokens for Harbinger set.`);
+  console.log(`Tokens for Ubinetic set.`);
 };

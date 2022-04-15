@@ -1,0 +1,26 @@
+{
+  "0": {
+    "name": "XTZ-USD",
+    "decimals": "1000000"
+  },
+  "1": {
+    "name": "BTC-USD",
+    "decimals": "100000000"
+  },
+  "4": {
+    "name": "COMP-USD",
+    "decimals": "1000000000000000000"
+  },
+  "5": {
+    "name": "LINK-USD",
+    "decimals": "1000000000000000000"
+  },
+  "6": {
+    "name": "ETH-USD",
+    "decimals": "1000000000000000000"
+  },
+  "7": {
+    "name": "DAI-USDC",
+    "decimals": "1000000000000000000"
+  }
+}
