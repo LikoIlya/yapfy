@@ -1,0 +1,61 @@
+name: Testing Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+jobs:
+  jest:
+    name: Jest tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+          cache: 'yarn'
+          cache-dependency-path: './yarn.lock'
+      - name: Install Git
+        run: sudo apt install git -y
+      - name: Install modules
+        run: yarn install
+      - name: Compile contracts for tests
+        run: yarn compile-all
+      - name: Start sandbox and wait for initialization
+        run: yarn start-sandbox && sleep 10s
+      - name: Test the contracts
+        run: yarn test
+      - name: Stop sandbox
+        run: yarn stop-sandbox
+  # pytest:
+  #   name: Pytest tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v2
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "14"
+  #         cache: 'yarn'
+  #         cache-dependency-path: './yarn.lock'
+  #     - name: Set up Python
+  #       run: sudo apt install python pip
+  #     - name: Install crypto libs
+  #       run: sudo apt install libsodium-dev libsecp256k1-dev libgmp-dev
+  #     - name: Install pytezos and pytest
+  #       run: pip install pytezos pytest
+  #     - name: Install node modules
+  #       run: yarn install
+  #     - name: Compile contracts
+  #       run: yarn compile
+  #     - name: Run scenario tests
+  #       run: pytest -s -v
+
