@@ -14,7 +14,7 @@ import hTokens from "../storage/harbinger_tokens.json";
 import uTokens from "../storage/ubinetic_tokens.json";
 import BigNumber from 'bignumber.js';
 import { TezosAddress } from "../utils/helpers";
-const proxyPrecision = new BigNumber("1e18");
+const proxyPrecision = new BigNumber("1e36");
 
 describe("Router", () => {
   let router: Contract;
