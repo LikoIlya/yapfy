@@ -1,6 +1,19 @@
 import  { MichelsonMap }  from"@taquito/michelson-encoder";
 import { alice } from "../utils/cli";
 
+export const tokenPrices = {
+  "BAT-USDC": 699505,
+  "BTC-USD": 62762042028,
+  "COMP-USD": 321748180,
+  "DAI-USDC": 999843,
+  "ETH-USD": 4120747980,
+  "KNC-USD": 1635090,
+  "LINK-USD": 28960520,
+  "REP-USD": 24580998,
+  "XTZ-USD": 6817004,
+  "ZRX-USD": 1017038,
+}
+
 export default {
   assetCodes: [
     "BAT-USDC",

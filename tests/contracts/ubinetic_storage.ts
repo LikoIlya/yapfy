@@ -1,13 +1,15 @@
 import { MichelsonMap } from "@taquito/taquito";
 
+export const tokenPrices = {
+  DEFI: 1000000,
+  BTC: 50000000000,
+  XTZ: 30000000
+}
+
 export default {
   administrator: "tz3PmupcJFTWizddEahCtjtzDEhJf5TuuajK",
   last_epoch: 9999999,
-  prices:  MichelsonMap.fromLiteral({
-    DEFI: 1000000,
-    BTC: 50000000000,
-    XTZ: 30000000
-  }),
+  prices:  MichelsonMap.fromLiteral(tokenPrices),
   response_threshold: 2,
   valid_epoch: 999999,
   valid_respondants: [],
