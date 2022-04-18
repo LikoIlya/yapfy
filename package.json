@@ -50,6 +50,7 @@
     "compile-contract": "yarn cli compile -F json",
     "compile-parser": "./scripts/compileParser.sh",
     "parser-to-bytes": "./scripts/parserToBytes.sh",
+    "compile-all": "yarn compile --contract router && yarn parser-to-bytes harbinger && yarn parser-to-bytes ubinetic",
     "test": "jest"
   }
 }

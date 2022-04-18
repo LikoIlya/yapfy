@@ -1,0 +1,20 @@
+{ parameter (or (unit %default) (pair %priceCallback (nat %tokenId) (nat %amount))) ;
+  storage (pair (address %admin) (nat %value) (map %priceF nat nat)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP }
+           { SWAP ;
+             DUP ;
+             GET 4 ;
+             DUP 3 ;
+             CDR ;
+             DIG 3 ;
+             CAR ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             UPDATE 4 } ;
+         NIL operation ;
+         PAIR } }
+
