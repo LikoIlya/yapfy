@@ -1,0 +1,238 @@
+{ parameter
+    (or (or (or (set %getPrice nat) (nat %receivePrice))
+            (or (nat %setTimestampLimit) (pair %updateAsset (string %assetName) (nat %tokenId))))
+        (pair %updateOracle (address %oracle) (nat %oraclePrecision) (nat %timestampLimit))) ;
+  storage
+    (pair (address %router)
+          (address %oracle)
+          (nat %oraclePrecision)
+          (int %timestampLimit)
+          (big_map %assetName nat string)
+          (big_map %assetId string nat)
+          (big_map %metadata string bytes)) ;
+  code { PUSH string "P_NOT_ORACLE_CONTRACT" ;
+         PUSH string "P_NOT_ROUTER" ;
+         PUSH string "cTez" ;
+         PUSH string "cTez-only" ;
+         LAMBDA
+           (pair bool string)
+           unit
+           { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
+         LAMBDA
+           (pair (option nat) string)
+           nat
+           { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
+         DIG 6 ;
+         UNPAIR ;
+         NIL operation ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT { DROP ; DIG 2 } { DROP ; DIG 2 } }
+               { IF_LEFT
+                   { DIG 3 ;
+                     SWAP ;
+                     DUP 9 ;
+                     DUP 3 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DUP 7 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     INT ;
+                     UPDATE 7 }
+                   { DIG 3 ;
+                     SWAP ;
+                     DUP 9 ;
+                     DUP 3 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DUP 7 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     DUP 7 ;
+                     DUP 9 ;
+                     DUP 3 ;
+                     CAR ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DUP 7 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     SWAP ;
+                     DUP ;
+                     GET 9 ;
+                     DUP 3 ;
+                     CAR ;
+                     DUP 4 ;
+                     CDR ;
+                     SWAP ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 9 ;
+                     DUP ;
+                     GET 11 ;
+                     DUP 3 ;
+                     CDR ;
+                     DIG 3 ;
+                     CAR ;
+                     SWAP ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 11 } } }
+           { DIG 3 ;
+             SWAP ;
+             DUP 9 ;
+             DUP 3 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             PAIR ;
+             DUP 7 ;
+             SWAP ;
+             EXEC ;
+             DROP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             UPDATE 3 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             UPDATE 5 ;
+             SWAP ;
+             GET 4 ;
+             INT ;
+             UPDATE 7 } ;
+         DIG 2 ;
+         IF_LEFT
+           { IF_LEFT
+               { DIG 2 ;
+                 DROP ;
+                 IF_LEFT
+                   { DIG 2 ;
+                     DIG 5 ;
+                     DIG 6 ;
+                     DROP 3 ;
+                     DUP 4 ;
+                     PUSH nat 1 ;
+                     DUP 3 ;
+                     SIZE ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DUP 4 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     NIL operation ;
+                     SWAP ;
+                     ITER { SWAP ;
+                            DUP 5 ;
+                            DUP 4 ;
+                            GET 9 ;
+                            DIG 3 ;
+                            MEM ;
+                            PAIR ;
+                            DUP 4 ;
+                            SWAP ;
+                            EXEC ;
+                            DROP ;
+                            SELF %receivePrice ;
+                            DUP 6 ;
+                            DUP 4 ;
+                            GET 3 ;
+                            CONTRACT %get_target (contract nat) ;
+                            IF_NONE { FAILWITH } { SWAP ; DROP } ;
+                            PUSH mutez 0 ;
+                            DIG 2 ;
+                            TRANSFER_TOKENS ;
+                            CONS } ;
+                     DIG 2 ;
+                     DIG 3 ;
+                     DIG 4 ;
+                     DROP 3 ;
+                     PAIR }
+                   { DIG 4 ;
+                     DROP ;
+                     PUSH string "P_NOT_ORACLE" ;
+                     DUP 3 ;
+                     GET 3 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DIG 4 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     PUSH nat 48 ;
+                     PUSH nat 1000000000000000000 ;
+                     DIG 2 ;
+                     MUL ;
+                     LSR ;
+                     PUSH nat 1000000 ;
+                     DIG 6 ;
+                     PUSH address "KT1P8Ep9y8EsDSD9YkvakWnDvF2orDcpYXSq" ;
+                     PUSH string "XTZ" ;
+                     VIEW "get_price" nat ;
+                     PAIR ;
+                     DUP 5 ;
+                     SWAP ;
+                     EXEC ;
+                     DIG 2 ;
+                     MUL ;
+                     EDIV ;
+                     IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 11 ;
+                     DIG 4 ;
+                     PUSH string "TOKEN_ID_NOT_DEFINED" ;
+                     DUG 2 ;
+                     GET ;
+                     PAIR ;
+                     DIG 3 ;
+                     SWAP ;
+                     EXEC ;
+                     NIL operation ;
+                     DIG 4 ;
+                     DUP 5 ;
+                     CAR ;
+                     CONTRACT %receivePrice (pair (nat %tokenId) (nat %priceF)) ;
+                     IF_NONE { FAILWITH } { SWAP ; DROP } ;
+                     PUSH mutez 0 ;
+                     DIG 4 ;
+                     DIG 4 ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     PAIR } }
+               { DIG 3 ;
+                 DIG 4 ;
+                 DIG 5 ;
+                 DIG 6 ;
+                 DIG 7 ;
+                 DIG 8 ;
+                 DROP 6 ;
+                 IF_LEFT { DROP ; SWAP ; PAIR } { DROP ; SWAP ; PAIR } } }
+           { DIG 3 ; DIG 4 ; DIG 5 ; DIG 6 ; DIG 7 ; DIG 8 ; DROP 7 ; SWAP ; PAIR } } }
+
