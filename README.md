@@ -48,7 +48,7 @@ yarn stop-sandbox
 # Compile contract
 
 ```
-yarn compile router
+yarn compile -c router
 
 ```
 

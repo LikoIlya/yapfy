@@ -1,12 +1,15 @@
 #! /bin/sh
-if [ "$(echo "${1}" | tr '[:upper:]' '[:lower:]')" = "ctez" ]; then
+PARSER="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
+if [ "$PARSER" = "ctez" ]; then
   set -o allexport
-  [[ -f .env ]] && source .env
+  if [ ! "$UBINETIC_ORACLE" ]; then
+    [ -f .env ] && . .env
+  fi
   UBINETIC_ORACLE="${UBINETIC_ORACLE:-tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg}"
   sed -i.bak "s/{env.UBINETIC_ORACLE}/\"$UBINETIC_ORACLE\"/gi" ./contracts/partial/parser/vendor/ctez/constants.ligo
 fi
-yarn cli compile -F tz -c parser/${1}
-if [ "$(echo "${1}" | tr '[:upper:]' '[:lower:]')" = "ctez" ]; then
+yarn cli compile -F tz -c parser/$PARSER
+if [ "$PARSER" = "ctez" ]; then
   mv ./contracts/partial/parser/vendor/ctez/constants.ligo.bak ./contracts/partial/parser/vendor/ctez/constants.ligo
   set +o allexport
 fi
