@@ -189,7 +189,7 @@
                      LSR ;
                      PUSH nat 1000000 ;
                      DIG 6 ;
-                     PUSH address "KT1P8Ep9y8EsDSD9YkvakWnDvF2orDcpYXSq" ;
+                     PUSH address "tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg" ;
                      PUSH string "XTZ" ;
                      VIEW "get_price" nat ;
                      PAIR ;
