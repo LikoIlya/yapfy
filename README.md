@@ -1,16 +1,6 @@
-# Description
-Edit for yourself:
-- package.json
-- /tests/
-- /contracts
-- /migrations
-- /storage
+# Yet Another Price Feed for [Yupana](https://github.com/madfish-solutions/yupana-protocol-core "Yupana")
 
-```
-./storage - prod storage
-./tests/storage - dev storage
-
-```
+[Yupana](https://github.com/madfish-solutions/yupana-protocol-core "Yupana")'s price feed implementation, allows to use multiple oracles with one contract.
 
 # Requirements
 
@@ -24,27 +14,6 @@ yarn install
 
 ```
 
-# Quick Start tests (TODO)
-
-```
-yarn start-sandbox
-
-```
-
-
-```
-yarn test
-
-``` 
-
-![image](https://user-images.githubusercontent.com/44075582/126524242-6fdd8cf3-a5b5-4143-b46f-97eb7a0a2e73.png)
-
-
-```
-yarn stop-sandbox
-
-```
-
 # Compile contract
 
 ```
@@ -53,6 +22,8 @@ yarn compile router
 ```
 
 # Compile bytes
+
+> **WARNING:** before compiling parsers make sure that [.env](./.env.example) file has all needed variables, especially correct **oracle addresses**
 
 Compile parser contract
 
@@ -75,6 +46,26 @@ yarn parser-to-bytes ${parserName}
 ex. 
 ```sh
 yarn parser-to-bytes harbinger
+```
+
+
+# Quick Start tests
+
+```
+yarn start-sandbox
+
+```
+
+
+```
+yarn test
+
+``` 
+
+
+```
+yarn stop-sandbox
+
 ```
 
 # Deploy contract
