@@ -126,7 +126,7 @@ describe("Router", () => {
       console.log("hOracle tokens mapped")
       for (var tokenId in hTokens) {
         const tokenParserAddress = await (await router.storage() as typeof storage).tokenIdToParser.get(tokenId);
-        expect(parserAddress).toEqual(tokenParserAddress);
+        expect(tokenParserAddress).toEqual(parserAddress);
       }
     })
     it("Get tokens prices", async () => {
@@ -141,7 +141,7 @@ describe("Router", () => {
       const parserPrecision = (await parser.storage() as {oraclePrecision: BigNumber.Value}).oraclePrecision
       for (const tokenId in hTokens) {
         const exptedPrice = new BigNumber(hTokenPrices[hTokens[tokenId].name]).multipliedBy(proxyPrecision).div(parserPrecision).dividedToIntegerBy(hTokens[tokenId].decimals);
-        expect(exptedPrice.toString()).toEqual(prices.get(tokenId).toString())
+        expect(prices.get(tokenId).toFormat(0)).toEqual(exptedPrice.toFormat(0))
       }
     });
   });
@@ -229,7 +229,7 @@ describe("Router", () => {
       const parserPrecision = (await parser.storage() as {oraclePrecision: BigNumber.Value}).oraclePrecision
       for (const tokenId in uTokens) {
         const exptedPrice = new BigNumber(uTokenPrices[uTokens[tokenId].name]).multipliedBy(proxyPrecision).div(parserPrecision).dividedToIntegerBy(uTokens[tokenId].decimals);
-        expect(exptedPrice.toString()).toEqual(prices.get(tokenId).toString())
+        expect(prices.get(tokenId).toFormat(0)).toEqual(exptedPrice.toFormat(0))
       }
     });
   });
@@ -318,8 +318,7 @@ describe("Router", () => {
       const parserPrecision = (await parser.storage() as {oraclePrecision: BigNumber.Value}).oraclePrecision
       for (const tokenId in cTokens) {
         const exptedPrice = new BigNumber(cTokenPrices[cTokens[tokenId].name]).multipliedBy(proxyPrecision).div(parserPrecision).dividedToIntegerBy(cTokens[tokenId].decimals);
-        expect(prices.get(tokenId).toNumber()).toBeLessThanOrEqual(exptedPrice.toNumber() + 2)
-        expect(prices.get(tokenId).toNumber()).toBeGreaterThanOrEqual(exptedPrice.toNumber() - 2)
+        expect(prices.get(tokenId).toFormat(0)).toEqual(exptedPrice.toFormat(0))
       }
     });
   });
@@ -339,9 +338,7 @@ describe("Router", () => {
         const parser = await Tezos.contract.at(parserAddress);
         const parserPrecision = (await parser.storage() as { oraclePrecision: BigNumber.Value }).oraclePrecision
         const exptedPrice = new BigNumber(all_prices[all_tokens[tokenId].name]).multipliedBy(proxyPrecision).div(parserPrecision).dividedToIntegerBy(all_tokens[tokenId].decimals);
-        expect(prices.get(tokenId).toNumber()).toBeLessThanOrEqual(exptedPrice.toNumber() + 2)
-        expect(prices.get(tokenId).toNumber()).toBeGreaterThanOrEqual(exptedPrice.toNumber() - 2)
-        console.log(exptedPrice.toString(), prices.get(tokenId).toString());
+        expect(prices.get(tokenId).toFormat(0)).toEqual(exptedPrice.toFormat(0))
       }
     });
   });

@@ -2,7 +2,7 @@ import  { MichelsonMap }  from"@taquito/michelson-encoder";
 import BigNumber from "bignumber.js"
 
 export const tokenPrices = {
-  "cTez": new BigNumber("1.1")
+  "cTez": new BigNumber("1.25")
 }
 
 export default {
@@ -14,5 +14,5 @@ export default {
   ovens: new MichelsonMap(),
   target: tokenPrices.cTez.multipliedBy(
     new BigNumber(2).pow(48)
-  ).toFixed(0, 1)
+  ).toFixed(0)
 }
