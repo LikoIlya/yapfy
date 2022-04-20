@@ -154,6 +154,7 @@ function connectNewOracle(
                         : routerReturn is
   block {
     require(Tezos.sender = s.admin, Errors.notAdmin);
+    require(not Big_map.mem(params.oracle, s.oracleParser), Errors.parserSet);
     const parserStorage : parserStorage = record [
       router          = Tezos.self_address;
       assetName       = (big_map[]: big_map(tokenId, assetString));

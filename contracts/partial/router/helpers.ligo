@@ -3,7 +3,7 @@
                         : contract(tokenSet) is
   unwrap(
     (Tezos.get_entrypoint_opt("%getPrice", parser): option(contract(tokenSet))),
-    Errors.notParser
+    Errors.notParserGet
   );
 
 [@inline] function getParserTimestampSetter(
