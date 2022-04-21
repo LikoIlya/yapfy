@@ -61,7 +61,7 @@ function receivePrice(
                         : parserReturn is
   block {
     mustBeOracle(s.oracle);
-    const cTezToTezpriceF : precisionValue = Bitwise.shift_right(price * precision, 48n);
+    const cTezToTezpriceF : precisionValue = Bitwise.shift_right(price * precision, s.oraclePrecision);
     const priceF = cTezToTezpriceF * getTezPriceView(unit) / Constants.ubinetic_precision;
     const tokenId : nat = checkAssetId(Constants.assetName, s.assetId);
     var operations : list(operation) := list[

@@ -17,7 +17,7 @@ module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
   await confirmOperation(tezos, op.hash);
   const cTezOracle = process.env.CTEZ_ORACLE;
   const cTezDeadline = 1;
-  const cTezDecimals = 1;
+  const cTezDecimals = 48;
   op = await contract.methodsObject.connectOracle({
     oracle: cTezOracle,
     oraclePrecision: cTezDecimals,

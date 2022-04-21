@@ -401,7 +401,7 @@ describe("Router", () => {
       let parserOp = await router.methodsObject
         .connectOracle({
           oracle: cOracle.address,
-          oraclePrecision: 1,
+          oraclePrecision: 48,
           timestampLimit: 1,
           parserType,
         })
