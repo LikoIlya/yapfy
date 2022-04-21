@@ -81,7 +81,7 @@ describe("Router", () => {
       const initFunction = fs
         .readFileSync("./build/bytes/harbinger.hex")
         .toString();
-      const bobsTezos = new TezosToolkit(Tezos.rpc)
+      const bobsTezos = new TezosToolkit(Tezos.rpc);
       bobsTezos.setSignerProvider(signerBob);
       const bobsRouter = await bobsTezos.contract.at(router.address);
       return await failCase(
@@ -113,7 +113,7 @@ describe("Router", () => {
       expect(parserBytes).toEqual(initFunction);
     });
 
-    it("Should fail when add existing type", async () => 
+    it("Should fail when add existing type", async () =>
       await failCase(
         "alice",
         async () =>
@@ -124,11 +124,10 @@ describe("Router", () => {
             })
             .send(),
         "P_PARSER_TYPE_SET"
-      )
-    );
+      ));
 
     it("Should fail when connect not by admin", async () => {
-      const bobsTezos = new TezosToolkit(Tezos.rpc)
+      const bobsTezos = new TezosToolkit(Tezos.rpc);
       bobsTezos.setSignerProvider(signerBob);
       const bobsRouter = await bobsTezos.contract.at(router.address);
       return await failCase(
@@ -143,7 +142,7 @@ describe("Router", () => {
             })
             .send(),
         "P_NOT_ADMIN"
-      )
+      );
     });
 
     it("Connect oracle with proxy by parser", async () => {
@@ -183,7 +182,8 @@ describe("Router", () => {
         new BigNumber(150000000).toString()
       );
     });
-    it("Should fail when connect existing oracle", async () => await failCase(
+    it("Should fail when connect existing oracle", async () =>
+      await failCase(
         "alice",
         async () =>
           await router.methodsObject
@@ -195,8 +195,7 @@ describe("Router", () => {
             })
             .send(),
         "P_PARSER_ALREADY_SET"
-      )
-    );
+      ));
     it("Add supported tokens to proxy", async () => {
       const parserAddress = await (
         (await router.storage()) as typeof storage
@@ -435,6 +434,7 @@ describe("Router", () => {
         new BigNumber(1).toString()
       );
     });
+
     it("Add supported tokens to proxy", async () => {
       const parserAddress = await (
         (await router.storage()) as typeof storage
@@ -462,6 +462,21 @@ describe("Router", () => {
         expect(parserAddress).toEqual(tokenParserAddress);
       }
     });
+
+    it("should fail if not supported token tried to add (non-cTez)", async () =>
+      await failCase(
+        "alice",
+        async () =>
+          await router.methodsObject
+            .updateAsset({
+              tokenId: "9",
+              assetName: "NotCTez",
+              decimals: "6",
+              oracle: cOracle.address,
+            })
+            .send(),
+        "cTez-only"
+      ));
     it("Get tokens prices", async () => {
       const op = await router.methods.getPrice(Object.keys(cTokens)).send();
       await confirmOperation(Tezos, op.hash);
