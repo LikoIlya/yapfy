@@ -1,58 +1,29 @@
-# Description
-Edit for yourself:
-- package.json
-- /tests/
-- /contracts
-- /migrations
-- /storage
+# Yet Another Price Feed for [Yupana](https://github.com/madfish-solutions/yupana-protocol-core "Yupana")
 
-```
-./storage - prod storage
-./tests/storage - dev storage
+[Yupana](https://github.com/madfish-solutions/yupana-protocol-core "Yupana")'s price feed implementation, allows to use multiple oracles with one contract.
 
-```
-
-# Requirements
+## Requirements
 
 - Installed NodeJS (tested with NodeJS v14+)
 - Installed Yarn
+- Docker
 
 - Installed node modules:
 
-```
+```sh
 yarn install
-
 ```
 
-# Quick Start tests (TODO)
+## Compile
+### Compile contract
 
-```
-yarn start-sandbox
-
-```
-
-
-```
-yarn test
-
-``` 
-
-![image](https://user-images.githubusercontent.com/44075582/126524242-6fdd8cf3-a5b5-4143-b46f-97eb7a0a2e73.png)
-
-
-```
-yarn stop-sandbox
-
-```
-
-# Compile contract
-
-```
+```sh
 yarn compile -c router
-
 ```
 
-# Compile bytes
+### Compile bytes
+
+> **WARNING:** before compiling parsers make sure that [.env](./.env.example) file has all needed variables, especially correct **oracle addresses**
 
 Compile parser contract
 
@@ -77,9 +48,40 @@ ex.
 yarn parser-to-bytes harbinger
 ```
 
+### Compile all
+
+```sh
+yarn compile-all
+```
+
+## Testing
+### Start Tezos Flextesa sandbox local chain
+
+Flextesa sandbox run in Docker container, but you can change the [config](./config.ts) file properties to connect to another RPC nodes if you want to.
+
+```sh
+yarn start-sandbox
+```
+
+### Start Jest tests
+
+Repository has some tests with Taquito and Jest located inside [tests](./tests) folder.
+
+```sh
+yarn test
+``` 
+
+### Stop local chain
+
+If you had started the local chain before the running tests, recomended to stop the chain right after the tests.
+
+```sh
+yarn stop-sandbox
+```
+
 # Deploy contract
 
-```
-yarn migrate
 
+```sh
+yarn migrate
 ```
