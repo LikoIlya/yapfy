@@ -34,7 +34,7 @@ import cTokens from "../storage/ctez_tokens.json";
 import BigNumber from "bignumber.js";
 import { failCase, TezosAddress } from "../utils/helpers";
 import { prepareCtezBytes } from "./utils/prepare_ctez";
-const proxyPrecision = new BigNumber("1e18");
+const proxyPrecision = new BigNumber("1e36");
 
 describe("Router", () => {
   let router: Contract;
