@@ -475,7 +475,7 @@ describe("Router", () => {
               oracle: cOracle.address,
             })
             .send(),
-        "cTez-only"
+        "cTez_ONLY"
       ));
     it("Get tokens prices", async () => {
       const op = await router.methods.getPrice(Object.keys(cTokens)).send();
