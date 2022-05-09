@@ -8,7 +8,7 @@
   )
 
 
-[@inline] function getTezPriceView(
+[@inline] function getTezToUsdPriceView(
     const _               : unit)
                           : nat is
     unwrap(
@@ -23,7 +23,7 @@ function updateAsset(
                         : parserStorage is
   block {
     mustBeRouter(s.router);
-    require(param.assetName = Constants.assetName, Constants.only_ctez_error);
+    require(param.assetName = Constants.assetName, Errors.AssetCheck.cTezOnly);
     s.assetName[param.tokenId] := param.assetName;
     s.assetId[param.assetName] := param.tokenId;
   } with s
@@ -61,8 +61,8 @@ function receivePrice(
                         : parserReturn is
   block {
     mustBeOracle(s.oracle);
-    const cTezToTezpriceF : precisionValue = Bitwise.shift_right(price * precision, 48n);
-    const priceF = cTezToTezpriceF * getTezPriceView(unit) / Constants.ubinetic_precision;
+    const cTezToTezPriceF : precisionValue = Bitwise.shift_right(price * precision, 48n);
+    const priceF = cTezToTezPriceF * getTezPriceView(unit) / Constants.ubinetic_precision;
     const tokenId : nat = checkAssetId(Constants.assetName, s.assetId);
     var operations : list(operation) := list[
       Tezos.transaction(
