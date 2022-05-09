@@ -1,4 +1,4 @@
-const precision = 1_000_000_000_000_000_000n;
+const precision = 1_000_000_000_000_000_000_000_000_000_000_000_000n;
 
 function require(
   const param           : bool;

@@ -5,4 +5,5 @@ const timestampLimit           : string = "P_OLD_PRICE_RECEIVED";
 module AssetCheck is {
   const assetString            : string = "STRING_NOT_DEFINED";
   const tokenId                : string = "TOKEN_ID_NOT_DEFINED";
+  const cTezOnly               : string = "cTez_ONLY";
 }
