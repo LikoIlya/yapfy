@@ -33,13 +33,13 @@ function getPrice(
   const s               : parserStorage)
                         : parserReturn is
   block {
-    require(Set.cardinal(tokenSet) = 1n, Constants.only_ctez_error);
+    require(Set.cardinal(tokenSet) = 1n, Errors.AssetCheck.cTezOnly);
     function oneTokenUpd(
       const operations  : list(operation);
       const tokenId     : nat)
                         : list(operation) is
       block {
-        require(Big_map.mem(tokenId, s.assetName), Constants.only_ctez_error);
+        require(Big_map.mem(tokenId, s.assetName), Errors.AssetCheck.cTezOnly);
         const param : contract(nat) = Tezos.self("%receivePrice");
         const receivePriceOp = Tezos.transaction(
           param,
