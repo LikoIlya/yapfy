@@ -2,9 +2,10 @@ module AssetCheck is {
    const decimals               : string = "DECIMALS_NOT_DEFINED";
 }
 const notAdmin                 : string = "P_NOT_ADMIN";
+const notParser                : string = "P_NOT_PARSER";
 const noParser                 : string = "P_PARSER_NOT_FOUND";
 const parserSet                : string = "P_PARSER_ALREADY_SET";
-const notParser                : string = "P_NOT_PARSER_GET";
+const notParserGet             : string = "P_NOT_PARSER_GET";
 const notParserTimestampSetter : string = "P_NOT_PARSER_TIME_SETTER";
 const notParserAssetSetter     : string = "P_NOT_PARSER_ASSET_SETTER";
 const notParserOracleSetter    : string = "P_NOT_PARSER_ORACLE_SETTER";

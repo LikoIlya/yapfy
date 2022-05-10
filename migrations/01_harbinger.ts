@@ -14,7 +14,6 @@ module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
     parserType: "HarbinderCB",
     initFunction: harbingerBytes
   }).send();
-  BytesValidationError
   await confirmOperation(tezos, op.hash);
   const harbingerOracle = process.env.HARBINGER_ORACLE;
   const harbingerDeadline = 300;

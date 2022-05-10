@@ -1,4 +1,5 @@
 #! /bin/sh
-yarn compile-parser ${1};
-yarn cli get-parser-bytes --parser ${1}
+PARSER="$(echo "${1}" | tr '[:upper:]' '[:lower:]')"
+yarn compile-parser "$PARSER";
+yarn cli get-parser-bytes --parser "$PARSER"
 
