@@ -12,8 +12,8 @@
           (big_map %metadata string bytes)) ;
   code { PUSH string "P_NOT_ORACLE_CONTRACT" ;
          PUSH string "P_NOT_ROUTER" ;
+         PUSH string "cTez_ONLY" ;
          PUSH string "cTez" ;
-         PUSH string "cTez-only" ;
          LAMBDA
            (pair bool string)
            unit
@@ -60,8 +60,8 @@
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     DUP 7 ;
-                     DUP 9 ;
+                     DUP 8 ;
+                     DUP 8 ;
                      DUP 3 ;
                      CAR ;
                      COMPARE ;
@@ -127,7 +127,7 @@
                  DROP ;
                  IF_LEFT
                    { DIG 2 ;
-                     DIG 5 ;
+                     DIG 4 ;
                      DIG 6 ;
                      DROP 3 ;
                      DUP 4 ;
@@ -169,7 +169,7 @@
                      DIG 4 ;
                      DROP 3 ;
                      PAIR }
-                   { DIG 4 ;
+                   { DIG 5 ;
                      DROP ;
                      PUSH string "P_NOT_ORACLE" ;
                      DUP 3 ;
@@ -183,7 +183,7 @@
                      EXEC ;
                      DROP ;
                      PUSH nat 48 ;
-                     PUSH nat 1000000000000000000 ;
+                     PUSH nat 1000000000000000000000000000000000000 ;
                      DIG 2 ;
                      MUL ;
                      LSR ;
