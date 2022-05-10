@@ -1,18 +1,18 @@
 {
-  "name": "Ligo-taquito-skeleton",
+  "name": "yapfy",
   "version": "1.0.0",
-  "description": "",
+  "description": "Yet another price feed for Yupana",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/repo.git"
+    "url": "git+https://github.com/madfish-solutions/yapfy.git"
   },
-  "author": "e1",
-  "license": "ISC",
+  "author": "Illia Likhoshva <likhoshva@madfish.solutions>",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/repo/issues"
+    "url": "https://github.com/madfish-solutions/yapfy/issues"
   },
-  "homepage": "https://github.com/repo#readme",
+  "homepage": "https://github.com/madfish-solutions/yapfy#readme",
   "dependencies": {
     "@taquito/signer": "^12.0.0",
     "@taquito/taquito": "^12.0.0",
