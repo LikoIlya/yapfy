@@ -66,7 +66,7 @@ describe("Router", () => {
     }
   });
 
-  describe("Habringer example oracle (callback)", () => {
+  describe("Harbinger example oracle (callback)", () => {
     const parserType = "HarbinderCB";
     beforeAll(async () => {
       const hOp = await Tezos.contract.originate({
