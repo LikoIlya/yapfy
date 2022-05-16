@@ -1,12 +1,16 @@
-[@inline] function getNormalizerContract(
-  const oracleAddress   : address)
-                        : contract(getType) is
-  unwrap(
-    (Tezos.get_entrypoint_opt("%get", oracleAddress)
-                        : option(contract(getType))),
-    Errors.wrongOContract
-  )
-
+[@inline] function getNormalizerPrice(
+  const oracleAddress   : address;
+  const asset           : string;
+  const timestampLimit  : int)
+                        : nat is
+  block {
+    const response: timestamp * nat = unwrap(
+      (Tezos.call_view("getPrice", asset, oracleAddress)
+                          : option(timestamp * nat)),
+      Errors.wrongOContract
+    );
+    checkTimestamp(response.0, timestampLimit);
+  } with response.1;
 
 function getPrice(
   const tokenSet        : tokenSet;
@@ -19,41 +23,25 @@ function getPrice(
                         : list(operation) is
       block {
         const strName : string = checkAssetName(tokenId, s.assetName);
-        const param : contract(receivePriceParams) = Tezos.self("%receivePrice");
-
-        const receivePriceOp = Tezos.transaction(
-          Get(strName, param),
+        const oraclePrice = getNormalizerPrice(s.oracle, strName, s.timestampLimit);
+        const tezToUsdPrice = getNormalizerPrice(s.oracle, "XTZ-USD", s.timestampLimit);
+        const usd : bool = (oraclePrice = tezToUsdPrice);
+        const priceF : precisionValue = if (usd)
+          then s.oraclePrecision * precision / oraclePrice // invert to Tezos per dollar
+          else oraclePrice * precision / tezToUsdPrice;
+        const tokenId : nat = checkAssetId(strName, s.assetId);
+        var op : operation := Tezos.transaction(
+          record [
+            tokenId = tokenId;
+            priceF = priceF;
+          ],
           0mutez,
-          getNormalizerContract(s.oracle)
+          getRouterPriceCallbackMethod(s.router)
         );
-      } with receivePriceOp # operations;
-
-      const operations = Set.fold(
-        oneTokenUpd,
-        tokenSet,
-        (nil : list(operation))
-      );
-  } with (operations, s)
-
-function receivePrice(
-  const param           : receivePriceParams;
-  var s                 : parserStorage)
-                        : parserReturn is
-  block {
-    mustBeOracle(s.oracle);
-    checkTimestamp(param.1.0, s.timestampLimit);
-    const assetName : string = param.0;
-    const oraclePrice = param.1.1;
-    const priceF : precisionValue = oraclePrice * precision / s.oraclePrecision;
-    const tokenId : nat = checkAssetId(assetName, s.assetId);
-    var operations : list(operation) := list[
-      Tezos.transaction(
-        record [
-          tokenId = tokenId;
-          priceF = priceF;
-        ],
-        0mutez,
-        getRouterPriceCallbackMethod(s.router)
-      )
-    ];
+      } with op # operations;
+    const operations = Set.fold(
+      oneTokenUpd,
+      tokenSet,
+      (nil : list(operation))
+    )
   } with (operations, s)

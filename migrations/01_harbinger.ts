@@ -11,7 +11,7 @@ module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
   const contractAddress: TezosAddress = router.networks[network].router;
   const contract = await tezos.contract.at(contractAddress);
   let op = await contract.methodsObject.addParserType({
-    parserType: "HarbinderCB",
+    parserType: "Harbinder",
     initFunction: harbingerBytes
   }).send();
   await confirmOperation(tezos, op.hash);
@@ -22,7 +22,7 @@ module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
     oracle: harbingerOracle,
     oraclePrecision: harbingerDecimals,
     timestampLimit: harbingerDeadline,
-    parserType: "HarbinderCB",
+    parserType: "Harbinder",
   }).send();
   await confirmOperation(tezos, op.hash);
   const parserAddress = await (await contract.storage() as any).oracleParser.get(harbingerOracle);

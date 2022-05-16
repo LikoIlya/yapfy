@@ -9,7 +9,7 @@
     );
 
 function getPrice(
-  const tokenSet        : set(nat);
+  const tokenSet        : tokenSet;
   const s               : parserStorage)
                         : parserReturn is
   block {
@@ -20,7 +20,11 @@ function getPrice(
       block {
         const strName : string = checkAssetName(tokenId, s.assetName);
         const oraclePrice : nat = getOraclePriceView(s.oracle, strName);
-        const priceF : precisionValue = oraclePrice * precision / s.oraclePrecision;
+        const tezToUsdPrice : nat = getOraclePriceView(s.oracle, "XTZ");
+        const usd : bool = (oraclePrice = tezToUsdPrice);
+        const priceF : precisionValue = if (usd)
+          then s.oraclePrecision * precision / oraclePrice // invert to Tezos per dollar
+          else oraclePrice * precision / tezToUsdPrice;
         const tokenId : nat = checkAssetId(strName, s.assetId);
         var op : operation := Tezos.transaction(
           record [

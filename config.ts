@@ -5,7 +5,7 @@ dotenv.config();
 
 export const config = {
   repoName: "example-core",
-  ligoVersion: "0.39.0",
+  ligoVersion: "0.41.0",
   preferredLigoFlavor: "pascaligo",
   networks: {
     sandbox: {

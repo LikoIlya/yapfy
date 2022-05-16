@@ -3,5 +3,6 @@
 #include "../../partial/parser/storage.ligo"
 #include "../../partial/parser/helpers.ligo"
 #include "../../partial/parser/methods.ligo"
-#include "../../partial/parser/vendor/harbinger/methods.ligo"
+#import "../../partial/parser/vendor/wtez/constants.ligo" "Constants"
+#include "../../partial/parser/vendor/wtez/methods.ligo"
 #include "../../partial/parser/main.ligo"

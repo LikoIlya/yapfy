@@ -21,9 +21,9 @@ const metadata = MichelsonMap.fromLiteral({
 
 const parserMap = new MichelsonMap<string, BytesString>();
 // const hab = fs.readFileSync("./build/bytes/harbinger.hex").toString()
-// parserMap.set("HarbinderCB", hab);
+// parserMap.set("Harbinger", hab);
 // const ubi = fs.readFileSync("./build/bytes/ubinetic.hex").toString()
-// parserMap.set("UbineticV", ubi);
+// parserMap.set("Ubinetic", ubi);
 
 export default {
   admin                   : alice.pkh as TezosAddress,

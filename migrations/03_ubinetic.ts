@@ -10,7 +10,7 @@ module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
   const contractAddress: TezosAddress = router.networks[network].router;
   const contract = await tezos.contract.at(contractAddress);
   let op = await contract.methodsObject.addParserType({
-    parserType: "UbineticV",
+    parserType: "Ubinetic",
     initFunction: ubineticBytes
   }).send();
   await confirmOperation(tezos, op.hash);
@@ -21,7 +21,7 @@ module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
     oracle: ubineticOracle,
     oraclePrecision: ubineticDecimals,
     timestampLimit: ubineticDeadline,
-    parserType: "UbineticV",
+    parserType: "Ubinetic",
   }).send();
   await confirmOperation(tezos, op.hash);
   const parserAddress = await (await contract.storage() as any).oracleParser.get(ubineticOracle);
