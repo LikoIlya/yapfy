@@ -235,18 +235,17 @@ describe("Router", () => {
         (await parser.storage()) as { oraclePrecision: BigNumber.Value }
       ).oraclePrecision;
       for (const tokenId in hTokens) {
-        const exptedPrice =
+        let exptedPrice =
           hTokens[tokenId].name == "XTZ-USD"
-            ? new BigNumber(proxyPrecision)
-                .multipliedBy(parserPrecision)
-                .dividedBy(hTokenPrices[hTokens[tokenId].name])
-                .dividedToIntegerBy(hTokens[tokenId].decimals)
-            : new BigNumber(hTokenPrices[hTokens[tokenId].name])
-                .multipliedBy(1e6)
-                .dividedBy(hTokenPrices["XTZ-USD"])
-                .multipliedBy(proxyPrecision)
-                .div(parserPrecision)
-                .dividedToIntegerBy(hTokens[tokenId].decimals);
+            ? new BigNumber(parserPrecision).dividedBy(
+                hTokenPrices[hTokens[tokenId].name]
+              )
+            : new BigNumber(hTokenPrices[hTokens[tokenId].name]).dividedBy(
+                hTokenPrices["XTZ-USD"]
+              );
+        exptedPrice = exptedPrice
+          .multipliedBy(proxyPrecision)
+          .dividedToIntegerBy(hTokens[tokenId].decimals);
         expect(prices.get(tokenId).toNumber()).toBeCloseTo(
           exptedPrice.toNumber(),
           -3
@@ -363,18 +362,17 @@ describe("Router", () => {
         (await parser.storage()) as { oraclePrecision: BigNumber.Value }
       ).oraclePrecision;
       for (const tokenId in uTokens) {
-        const exptedPrice =
+        let exptedPrice =
           uTokens[tokenId].name == "XTZ"
-            ? new BigNumber(proxyPrecision)
-                .multipliedBy(parserPrecision)
-                .dividedBy(uTokenPrices[uTokens[tokenId].name])
-                .dividedToIntegerBy(uTokens[tokenId].decimals)
-            : new BigNumber(uTokenPrices[uTokens[tokenId].name])
-                .multipliedBy(1e6)
-                .dividedBy(uTokenPrices.XTZ)
-                .multipliedBy(proxyPrecision)
-                .div(parserPrecision)
-                .dividedToIntegerBy(uTokens[tokenId].decimals);
+            ? new BigNumber(parserPrecision).dividedBy(
+                uTokenPrices[uTokens[tokenId].name]
+              )
+            : new BigNumber(uTokenPrices[uTokens[tokenId].name]).dividedBy(
+                uTokenPrices.XTZ
+              );
+        exptedPrice = exptedPrice
+          .multipliedBy(proxyPrecision)
+          .dividedToIntegerBy(uTokens[tokenId].decimals);
         expect(prices.get(tokenId).toNumber()).toBeCloseTo(
           exptedPrice.toNumber(),
           -3
@@ -688,29 +686,26 @@ describe("Router", () => {
           (await parser.storage()) as { oraclePrecision: BigNumber.Value }
         ).oraclePrecision;
         let exptedPrice = new BigNumber(0);
-        console.log(all_tokens[tokenId].name);
         if (Object({ ...hTokens, ...uTokens }).hasOwnProperty(tokenId)) {
-          if ((all_tokens[tokenId].name as string).startsWith("XTZ")) // if Call by XTZ price - USD token, invert price.
-            exptedPrice = new BigNumber(parserPrecision)
-              .dividedBy(all_prices[all_tokens[tokenId].name]);
+          if ((all_tokens[tokenId].name as string).startsWith("XTZ"))
+            // if Call by XTZ price - USD token, invert price.
+            exptedPrice = new BigNumber(parserPrecision).dividedBy(
+              all_prices[all_tokens[tokenId].name]
+            );
           else {
             exptedPrice = new BigNumber(all_prices[all_tokens[tokenId].name]);
             if (Object(hTokens).hasOwnProperty(tokenId))
               exptedPrice = exptedPrice.dividedBy(all_prices["XTZ-USD"]);
-            else
-              exptedPrice = exptedPrice.dividedBy(all_prices["XTZ"]);
+            else exptedPrice = exptedPrice.dividedBy(all_prices["XTZ"]);
           }
-        } else if (Object({ ...cTokens, ...wTokens }).hasOwnProperty(tokenId)) // oracles returns prices in XTZ
-          exptedPrice = new BigNumber(all_prices[all_tokens[tokenId].name])
-            .dividedBy(parserPrecision);
+        } else if (Object({ ...cTokens, ...wTokens }).hasOwnProperty(tokenId))
+          // oracles returns prices in XTZ
+          exptedPrice = new BigNumber(
+            all_prices[all_tokens[tokenId].name]
+          ).dividedBy(parserPrecision);
         exptedPrice = exptedPrice
           .multipliedBy(proxyPrecision)
           .dividedToIntegerBy(all_tokens[tokenId].decimals);
-        console.log(
-          all_tokens[tokenId].name,
-          prices.get(tokenId).toNumber(),
-          exptedPrice.toNumber()
-        );
         expect(prices.get(tokenId).toNumber()).toBeCloseTo(
           exptedPrice.toNumber(),
           -3
