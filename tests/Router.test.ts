@@ -689,32 +689,23 @@ describe("Router", () => {
         ).oraclePrecision;
         let exptedPrice = new BigNumber(0);
         console.log(all_tokens[tokenId].name);
-        if (
-          Object({ ...hTokens, ...uTokens }).hasOwnProperty(tokenId)
-        ) {
-          if ((all_tokens[tokenId].name as string).startsWith("XTZ"))
-            exptedPrice = new BigNumber(proxyPrecision)
-              .multipliedBy(parserPrecision)
+        if (Object({ ...hTokens, ...uTokens }).hasOwnProperty(tokenId)) {
+          if ((all_tokens[tokenId].name as string).startsWith("XTZ")) // if Call by XTZ price - USD token, invert price.
+            exptedPrice = new BigNumber(parserPrecision)
               .dividedBy(all_prices[all_tokens[tokenId].name]);
           else {
-            exptedPrice = new BigNumber(
-              all_prices[all_tokens[tokenId].name]
-            ).multipliedBy(1e6);
+            exptedPrice = new BigNumber(all_prices[all_tokens[tokenId].name]);
             if (Object(hTokens).hasOwnProperty(tokenId))
               exptedPrice = exptedPrice.dividedBy(all_prices["XTZ-USD"]);
             else
               exptedPrice = exptedPrice.dividedBy(all_prices["XTZ"]);
-            exptedPrice = exptedPrice
-              .multipliedBy(proxyPrecision)
-              .div(parserPrecision);
           }
-        } else if (Object({ ...cTokens, ...wTokens }).hasOwnProperty(tokenId))
+        } else if (Object({ ...cTokens, ...wTokens }).hasOwnProperty(tokenId)) // oracles returns prices in XTZ
           exptedPrice = new BigNumber(all_prices[all_tokens[tokenId].name])
-            .multipliedBy(proxyPrecision)
-            .div(parserPrecision);
-        exptedPrice = exptedPrice.dividedToIntegerBy(
-          all_tokens[tokenId].decimals
-        );
+            .dividedBy(parserPrecision);
+        exptedPrice = exptedPrice
+          .multipliedBy(proxyPrecision)
+          .dividedToIntegerBy(all_tokens[tokenId].decimals);
         console.log(
           all_tokens[tokenId].name,
           prices.get(tokenId).toNumber(),
