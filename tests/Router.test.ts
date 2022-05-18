@@ -384,7 +384,6 @@ describe("Router", () => {
   describe("cTez example oracle (callback)", () => {
     const parserType = "cTezCB";
     beforeAll(async () => {
-      prepareCtezBytes(uOracle.address);
       const cOp = await Tezos.contract.originate({
         code: cOracleCode,
         storage: cOracleStorage,
