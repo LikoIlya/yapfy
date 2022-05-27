@@ -17,6 +17,7 @@ function getPrice(
   const s               : parserStorage)
                         : parserReturn is
   block {
+     const tezToUsdPrice = getNormalizerPrice(s.oracle, "XTZ-USD", s.timestampLimit);
     function oneTokenUpd(
       const operations  : list(operation);
       const tokenId     : nat)
@@ -24,7 +25,6 @@ function getPrice(
       block {
         const strName : string = checkAssetName(tokenId, s.assetName);
         const oraclePrice = getNormalizerPrice(s.oracle, strName, s.timestampLimit);
-        const tezToUsdPrice = getNormalizerPrice(s.oracle, "XTZ-USD", s.timestampLimit);
         const usd : bool = (strName = "XTZ-USD"); // if price is XTZ/USD
         const priceF : precisionValue = if (usd)  // then this is the USD-peg and we should
           then s.oraclePrecision * precision / oraclePrice // invert to USD/XTZ (1/priceF)
