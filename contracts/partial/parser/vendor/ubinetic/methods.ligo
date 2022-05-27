@@ -20,8 +20,8 @@ function getPrice(
       block {
         const strName : string = checkAssetName(tokenId, s.assetName);
         const oraclePrice : nat = getOraclePriceView(s.oracle, strName);
-        const tezToUsdPrice : nat = getOraclePriceView(s.oracle, "XTZ");
-        const usd : bool = (oraclePrice = tezToUsdPrice); // if price is XTZ/USD
+        const tezToUsdPrice : nat = getOraclePriceView(s.oracle, "XTZUSD");
+        const usd : bool = (strName = "XTZUSD"); // if price is XTZ/USD
         const priceF : precisionValue = if (usd)  // then this is the USD-peg and we should
           then s.oraclePrecision * precision / oraclePrice // invert to USD/XTZ (1/priceF)
           else oraclePrice * precision / tezToUsdPrice; // else divide by XTZ/USD price to send XTZ-related price

@@ -117,7 +117,7 @@
                         DUP 5 ;
                         SWAP ;
                         EXEC ;
-                        PUSH string "XTZ" ;
+                        PUSH string "XTZUSD" ;
                         DUP 5 ;
                         GET 3 ;
                         PUSH string "P_NOT_ORACLE_CONTRACT" ;
@@ -128,8 +128,8 @@
                         DUP 6 ;
                         SWAP ;
                         EXEC ;
-                        DUP ;
-                        DUP 3 ;
+                        PUSH string "XTZUSD" ;
+                        DUP 4 ;
                         COMPARE ;
                         EQ ;
                         IF { DROP ;

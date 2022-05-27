@@ -182,8 +182,8 @@
                         EXEC ;
                         DROP ;
                         CDR ;
-                        DUP ;
-                        DUP 3 ;
+                        PUSH string "XTZ-USD" ;
+                        DUP 4 ;
                         COMPARE ;
                         EQ ;
                         IF { DROP ;

@@ -25,7 +25,7 @@ function getPrice(
         const strName : string = checkAssetName(tokenId, s.assetName);
         const oraclePrice = getNormalizerPrice(s.oracle, strName, s.timestampLimit);
         const tezToUsdPrice = getNormalizerPrice(s.oracle, "XTZ-USD", s.timestampLimit);
-        const usd : bool = (oraclePrice = tezToUsdPrice); // if price is XTZ/USD
+        const usd : bool = (strName = "XTZ-USD"); // if price is XTZ/USD
         const priceF : precisionValue = if (usd)  // then this is the USD-peg and we should
           then s.oraclePrecision * precision / oraclePrice // invert to USD/XTZ (1/priceF)
           else oraclePrice * precision / tezToUsdPrice; // else divide by XTZ/USD price to send XTZ-related price
