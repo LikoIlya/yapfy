@@ -9,10 +9,11 @@
     );
 
 function getPrice(
-  const tokenSet        : set(nat);
+  const tokenSet        : tokenSet;
   const s               : parserStorage)
                         : parserReturn is
   block {
+    const tezToUsdPrice : nat = getOraclePriceView(s.oracle, xtz_usd_price_name);
     function oneTokenUpd(
       const operations  : list(operation);
       const tokenId     : nat)
@@ -20,7 +21,10 @@ function getPrice(
       block {
         const strName : string = checkAssetName(tokenId, s.assetName);
         const oraclePrice : nat = getOraclePriceView(s.oracle, strName);
-        const priceF : precisionValue = oraclePrice * precision / s.oraclePrecision;
+        const usd : bool = (strName = xtz_usd_price_name); // if price is XTZ/USD
+        const priceF : precisionValue = if (usd)  // then this is the USD-peg and we should
+          then s.oraclePrecision * precision / oraclePrice // invert to USD/XTZ (1/priceF)
+          else oraclePrice * precision / tezToUsdPrice; // else divide by XTZ/USD price to send XTZ-related price
         const tokenId : nat = checkAssetId(strName, s.assetId);
         var op : operation := Tezos.transaction(
           record [

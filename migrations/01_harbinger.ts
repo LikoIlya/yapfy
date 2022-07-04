@@ -4,14 +4,13 @@ import { NetworkLiteral, TezosAddress } from "../utils/helpers";
 import router from "../build/router.json"
 import fs from "fs";
 import { confirmOperation } from "../utils/confirmation";
-import { BytesValidationError } from "@taquito/michelson-encoder";
 const harbingerBytes = fs.readFileSync("./build/bytes/harbinger.hex").toString();
 
 module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
   const contractAddress: TezosAddress = router.networks[network].router;
   const contract = await tezos.contract.at(contractAddress);
   let op = await contract.methodsObject.addParserType({
-    parserType: "HarbinderCB",
+    parserType: "Harbinger",
     initFunction: harbingerBytes
   }).send();
   await confirmOperation(tezos, op.hash);
@@ -22,7 +21,7 @@ module.exports = async (tezos: TezosToolkit, network: NetworkLiteral) => {
     oracle: harbingerOracle,
     oraclePrecision: harbingerDecimals,
     timestampLimit: harbingerDeadline,
-    parserType: "HarbinderCB",
+    parserType: "Harbinger",
   }).send();
   await confirmOperation(tezos, op.hash);
   const parserAddress = await (await contract.storage() as any).oracleParser.get(harbingerOracle);

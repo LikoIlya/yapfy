@@ -1,4 +1,15 @@
 const default_parser_metadata: big_map(string, bytes) = big_map[
-  "" -> 0x74657a6f732d73746f726167653a706172736572;
-  "parser" -> 0x7b226e616d65223a22597570616e6120504620506172736572222c226465736372697074696f6e223a2250726963652070617273657220666f7220597570616e6120507269636520466565642070726f7879222c22686f6d6570616765223a2268747470733a2f2f797570616e612e636f6d222c22696e7465726661636573223a5b22545a49502d303136225d2c22617574686f7273223a5b224d6164666973682e536f6c7574696f6e73203c68747470733a2f2f7777772e6d6164666973682e736f6c7574696f6e733e225d7d;
+  "" -> 0x697066733a2f2f516d62365a6e736938554637727550386651354a756661625568735442746b44796f444b465636476f4c56697172;
 ];
+// {
+//   "name": "Yupana PF Parser",
+//   "version": "v0.1.1-tez",
+//   "description": "Price parser for Yupana Price Feed proxy",
+//   "homepage": "https://yupana.finance",
+//   "interfaces": ["TZIP-016"],
+//   "authors": ["Madfish.Solutions <https://www.madfish.solutions>"],
+//   "source": {
+//     "tools": ["Ligo", "Flextesa"],
+//     "location": "https://github.com/madfish-solutions/yapfy/blob/v0.1.1-tez/contracts/main/parser"
+//   }
+// }

@@ -13,13 +13,10 @@
   code { PUSH string "P_NOT_ROUTER" ;
          PUSH nat 1000000000000000000000000000000000000 ;
          LAMBDA
-           (pair bool string)
-           unit
-           { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
-         LAMBDA
-           (pair (option (pair timestamp nat)) string)
-           (pair timestamp nat)
+           (pair (option nat) string)
+           nat
            { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
+         PUSH string "XTZ" ;
          DIG 4 ;
          UNPAIR ;
          NIL operation ;
@@ -37,11 +34,7 @@
                  SENDER ;
                  COMPARE ;
                  EQ ;
-                 PAIR ;
-                 DUP 7 ;
-                 SWAP ;
-                 EXEC ;
-                 DROP ;
+                 IF { DROP } { FAILWITH } ;
                  INT ;
                  UPDATE 7 } }
            { IF_LEFT
@@ -53,11 +46,7 @@
                  SENDER ;
                  COMPARE ;
                  EQ ;
-                 PAIR ;
-                 DUP 7 ;
-                 SWAP ;
-                 EXEC ;
-                 DROP ;
+                 IF { DROP } { FAILWITH } ;
                  SWAP ;
                  DUP ;
                  GET 9 ;
@@ -89,11 +78,7 @@
                  SENDER ;
                  COMPARE ;
                  EQ ;
-                 PAIR ;
-                 DUP 7 ;
-                 SWAP ;
-                 EXEC ;
-                 DROP ;
+                 IF { DROP } { FAILWITH } ;
                  DUP ;
                  DUG 2 ;
                  CAR ;
@@ -112,37 +97,17 @@
            { IF_LEFT
                { DIG 2 ;
                  DROP ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
-                 GET 7 ;
-                 PUSH string "XTZ-USD" ;
-                 DUP 4 ;
+                 DUP 3 ;
+                 DUP 3 ;
                  GET 3 ;
                  PUSH string "P_NOT_ORACLE_CONTRACT" ;
                  SWAP ;
                  DIG 2 ;
-                 VIEW "getPrice" (pair timestamp nat) ;
+                 VIEW "get_price" nat ;
                  PAIR ;
                  DUP 5 ;
                  SWAP ;
                  EXEC ;
-                 DUP ;
-                 DUG 2 ;
-                 CAR ;
-                 PUSH string "P_OLD_PRICE_RECEIVED" ;
-                 DIG 2 ;
-                 NOW ;
-                 SUB ;
-                 DIG 2 ;
-                 COMPARE ;
-                 GE ;
-                 PAIR ;
-                 DUP 6 ;
-                 SWAP ;
-                 EXEC ;
-                 DROP ;
-                 CDR ;
                  NIL operation ;
                  DIG 2 ;
                  ITER { SWAP ;
@@ -153,38 +118,18 @@
                         DUG 2 ;
                         GET ;
                         IF_NONE { FAILWITH } { SWAP ; DROP } ;
-                        DUP 4 ;
-                        GET 7 ;
-                        SWAP ;
                         DUP ;
-                        DUG 2 ;
-                        DUP 6 ;
+                        DUP 5 ;
                         GET 3 ;
                         PUSH string "P_NOT_ORACLE_CONTRACT" ;
                         SWAP ;
                         DIG 2 ;
-                        VIEW "getPrice" (pair timestamp nat) ;
+                        VIEW "get_price" nat ;
                         PAIR ;
                         DUP 7 ;
                         SWAP ;
                         EXEC ;
-                        DUP ;
-                        DUG 2 ;
-                        CAR ;
-                        PUSH string "P_OLD_PRICE_RECEIVED" ;
-                        DIG 2 ;
-                        NOW ;
-                        SUB ;
-                        DIG 2 ;
-                        COMPARE ;
-                        GE ;
-                        PAIR ;
-                        DUP 8 ;
-                        SWAP ;
-                        EXEC ;
-                        DROP ;
-                        CDR ;
-                        PUSH string "XTZ-USD" ;
+                        DUP 6 ;
                         DUP 3 ;
                         COMPARE ;
                         EQ ;
@@ -208,7 +153,10 @@
                         PUSH string "TOKEN_ID_NOT_DEFINED" ;
                         DUG 2 ;
                         GET ;
-                        IF_NONE { FAILWITH } { SWAP ; DROP } ;
+                        PAIR ;
+                        DUP 7 ;
+                        SWAP ;
+                        EXEC ;
                         DUP 9 ;
                         DUP 6 ;
                         CAR ;

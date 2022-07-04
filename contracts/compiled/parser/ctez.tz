@@ -10,19 +10,14 @@
           (big_map %assetName nat string)
           (big_map %assetId string nat)
           (big_map %metadata string bytes)) ;
-  code { PUSH string "P_NOT_ORACLE_CONTRACT" ;
-         PUSH string "P_NOT_ROUTER" ;
+  code { PUSH string "P_NOT_ROUTER" ;
          PUSH string "cTez_ONLY" ;
          PUSH string "cTez" ;
          LAMBDA
            (pair bool string)
            unit
            { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
-         LAMBDA
-           (pair (option nat) string)
-           nat
-           { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
-         DIG 6 ;
+         DIG 4 ;
          UNPAIR ;
          NIL operation ;
          SWAP ;
@@ -34,14 +29,14 @@
                { IF_LEFT
                    { DIG 3 ;
                      SWAP ;
-                     DUP 9 ;
+                     DUP 8 ;
                      DUP 3 ;
                      CAR ;
                      SENDER ;
                      COMPARE ;
                      EQ ;
                      PAIR ;
-                     DUP 7 ;
+                     DUP 6 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -49,25 +44,25 @@
                      UPDATE 7 }
                    { DIG 3 ;
                      SWAP ;
-                     DUP 9 ;
+                     DUP 8 ;
                      DUP 3 ;
                      CAR ;
                      SENDER ;
                      COMPARE ;
                      EQ ;
                      PAIR ;
-                     DUP 7 ;
+                     DUP 6 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     DUP 8 ;
-                     DUP 8 ;
+                     DUP 7 ;
+                     DUP 7 ;
                      DUP 3 ;
                      CAR ;
                      COMPARE ;
                      EQ ;
                      PAIR ;
-                     DUP 7 ;
+                     DUP 6 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -96,14 +91,14 @@
                      UPDATE 11 } } }
            { DIG 3 ;
              SWAP ;
-             DUP 9 ;
+             DUP 8 ;
              DUP 3 ;
              CAR ;
              SENDER ;
              COMPARE ;
              EQ ;
              PAIR ;
-             DUP 7 ;
+             DUP 6 ;
              SWAP ;
              EXEC ;
              DROP ;
@@ -126,10 +121,9 @@
                { DIG 2 ;
                  DROP ;
                  IF_LEFT
-                   { DIG 2 ;
-                     DIG 4 ;
-                     DIG 6 ;
-                     DROP 3 ;
+                   { DIG 3 ;
+                     DIG 5 ;
+                     DROP 2 ;
                      DUP 4 ;
                      PUSH nat 1 ;
                      DUP 3 ;
@@ -155,7 +149,7 @@
                             EXEC ;
                             DROP ;
                             SELF %receivePrice ;
-                            DUP 6 ;
+                            PUSH string "P_NOT_ORACLE_CONTRACT" ;
                             DUP 4 ;
                             GET 3 ;
                             CONTRACT %get_target (contract nat) ;
@@ -166,10 +160,9 @@
                             CONS } ;
                      DIG 2 ;
                      DIG 3 ;
-                     DIG 4 ;
-                     DROP 3 ;
+                     DROP 2 ;
                      PAIR }
-                   { DIG 5 ;
+                   { DIG 4 ;
                      DROP ;
                      PUSH string "P_NOT_ORACLE" ;
                      DUP 3 ;
@@ -178,7 +171,7 @@
                      COMPARE ;
                      EQ ;
                      PAIR ;
-                     DIG 4 ;
+                     DIG 3 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -187,32 +180,15 @@
                      DIG 2 ;
                      MUL ;
                      LSR ;
-                     PUSH nat 1000000 ;
-                     DIG 6 ;
-                     PUSH address "tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg" ;
-                     PUSH string "XTZ" ;
-                     VIEW "get_price" nat ;
-                     PAIR ;
-                     DUP 5 ;
-                     SWAP ;
-                     EXEC ;
-                     DIG 2 ;
-                     MUL ;
-                     EDIV ;
-                     IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
-                     CAR ;
                      SWAP ;
                      DUP ;
                      DUG 2 ;
                      GET 11 ;
-                     DIG 4 ;
+                     DIG 3 ;
                      PUSH string "TOKEN_ID_NOT_DEFINED" ;
                      DUG 2 ;
                      GET ;
-                     PAIR ;
-                     DIG 3 ;
-                     SWAP ;
-                     EXEC ;
+                     IF_NONE { FAILWITH } { SWAP ; DROP } ;
                      NIL operation ;
                      DIG 4 ;
                      DUP 5 ;
@@ -230,9 +206,7 @@
                  DIG 4 ;
                  DIG 5 ;
                  DIG 6 ;
-                 DIG 7 ;
-                 DIG 8 ;
-                 DROP 6 ;
+                 DROP 4 ;
                  IF_LEFT { DROP ; SWAP ; PAIR } { DROP ; SWAP ; PAIR } } }
-           { DIG 3 ; DIG 4 ; DIG 5 ; DIG 6 ; DIG 7 ; DIG 8 ; DROP 7 ; SWAP ; PAIR } } }
+           { DIG 3 ; DIG 4 ; DIG 5 ; DIG 6 ; DROP 5 ; SWAP ; PAIR } } }
 

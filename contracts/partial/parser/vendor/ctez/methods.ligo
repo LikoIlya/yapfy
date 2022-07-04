@@ -7,16 +7,6 @@
     Errors.wrongOContract
   )
 
-
-[@inline] function getTezToUsdPriceView(
-    const _               : unit)
-                          : nat is
-    unwrap(
-      (Tezos.call_view("get_price", "XTZ", Constants.ubinetic_oracle)
-                          : option(nat)),
-      Errors.wrongOContract
-    );
-
 function updateAsset(
   const param           : updateAssetParams;
   var s                 : parserStorage)
@@ -61,8 +51,7 @@ function receivePrice(
                         : parserReturn is
   block {
     mustBeOracle(s.oracle);
-    const cTezToTezPriceF : precisionValue = Bitwise.shift_right(price * precision, 48n);
-    const priceF = cTezToTezPriceF * getTezToUsdPriceView(unit) / Constants.ubinetic_precision;
+    const priceF : precisionValue = Bitwise.shift_right(price * precision, 48n);
     const tokenId : nat = checkAssetId(Constants.assetName, s.assetId);
     var operations : list(operation) := list[
       Tezos.transaction(

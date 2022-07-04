@@ -11,16 +11,12 @@
           (big_map %assetId string nat)
           (big_map %metadata string bytes)) ;
   code { PUSH string "P_NOT_ROUTER" ;
-         PUSH nat 1000000000000000000000000000000000000 ;
+         PUSH string "wTez_ONLY" ;
          LAMBDA
            (pair bool string)
            unit
            { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
-         LAMBDA
-           (pair (option (pair timestamp nat)) string)
-           (pair timestamp nat)
-           { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
-         DIG 4 ;
+         DIG 3 ;
          UNPAIR ;
          NIL operation ;
          SWAP ;
@@ -31,14 +27,14 @@
                { DROP ; DIG 2 }
                { DIG 3 ;
                  SWAP ;
-                 DUP 8 ;
+                 DUP 7 ;
                  DUP 3 ;
                  CAR ;
                  SENDER ;
                  COMPARE ;
                  EQ ;
                  PAIR ;
-                 DUP 7 ;
+                 DUP 6 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
@@ -47,14 +43,25 @@
            { IF_LEFT
                { DIG 3 ;
                  SWAP ;
-                 DUP 8 ;
+                 DUP 7 ;
                  DUP 3 ;
                  CAR ;
                  SENDER ;
                  COMPARE ;
                  EQ ;
                  PAIR ;
-                 DUP 7 ;
+                 DUP 6 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 DUP 6 ;
+                 PUSH string "wTez" ;
+                 DUP 3 ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 DUP 6 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
@@ -83,14 +90,14 @@
                  UPDATE 11 }
                { DIG 3 ;
                  SWAP ;
-                 DUP 8 ;
+                 DUP 7 ;
                  DUP 3 ;
                  CAR ;
                  SENDER ;
                  COMPARE ;
                  EQ ;
                  PAIR ;
-                 DUP 7 ;
+                 DUP 6 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
@@ -112,126 +119,52 @@
            { IF_LEFT
                { DIG 2 ;
                  DROP ;
-                 SWAP ;
-                 DUP ;
-                 DUG 2 ;
-                 GET 7 ;
-                 PUSH string "XTZ-USD" ;
                  DUP 4 ;
-                 GET 3 ;
-                 PUSH string "P_NOT_ORACLE_CONTRACT" ;
-                 SWAP ;
-                 DIG 2 ;
-                 VIEW "getPrice" (pair timestamp nat) ;
-                 PAIR ;
-                 DUP 5 ;
-                 SWAP ;
-                 EXEC ;
-                 DUP ;
-                 DUG 2 ;
-                 CAR ;
-                 PUSH string "P_OLD_PRICE_RECEIVED" ;
-                 DIG 2 ;
-                 NOW ;
-                 SUB ;
-                 DIG 2 ;
+                 PUSH nat 1 ;
+                 DUP 3 ;
+                 SIZE ;
                  COMPARE ;
-                 GE ;
+                 EQ ;
                  PAIR ;
-                 DUP 6 ;
+                 DUP 4 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
-                 CDR ;
                  NIL operation ;
-                 DIG 2 ;
+                 SWAP ;
                  ITER { SWAP ;
+                        DUP 5 ;
                         DUP 4 ;
                         GET 9 ;
-                        DIG 2 ;
-                        PUSH string "STRING_NOT_DEFINED" ;
-                        DUG 2 ;
-                        GET ;
-                        IF_NONE { FAILWITH } { SWAP ; DROP } ;
                         DUP 4 ;
-                        GET 7 ;
-                        SWAP ;
-                        DUP ;
-                        DUG 2 ;
-                        DUP 6 ;
-                        GET 3 ;
-                        PUSH string "P_NOT_ORACLE_CONTRACT" ;
-                        SWAP ;
-                        DIG 2 ;
-                        VIEW "getPrice" (pair timestamp nat) ;
+                        MEM ;
                         PAIR ;
-                        DUP 7 ;
-                        SWAP ;
-                        EXEC ;
-                        DUP ;
-                        DUG 2 ;
-                        CAR ;
-                        PUSH string "P_OLD_PRICE_RECEIVED" ;
-                        DIG 2 ;
-                        NOW ;
-                        SUB ;
-                        DIG 2 ;
-                        COMPARE ;
-                        GE ;
-                        PAIR ;
-                        DUP 8 ;
+                        DUP 5 ;
                         SWAP ;
                         EXEC ;
                         DROP ;
-                        CDR ;
-                        PUSH string "XTZ-USD" ;
-                        DUP 3 ;
-                        COMPARE ;
-                        EQ ;
-                        IF { DUP 8 ;
-                             DUP 6 ;
-                             GET 5 ;
-                             MUL ;
-                             EDIV ;
-                             IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
-                             CAR }
-                           { DUP 4 ;
-                             DUP 9 ;
-                             DIG 2 ;
-                             MUL ;
-                             EDIV ;
-                             IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
-                             CAR } ;
-                        DUP 5 ;
-                        GET 11 ;
-                        DIG 2 ;
-                        PUSH string "TOKEN_ID_NOT_DEFINED" ;
-                        DUG 2 ;
-                        GET ;
-                        IF_NONE { FAILWITH } { SWAP ; DROP } ;
-                        DUP 9 ;
                         DUP 6 ;
+                        DUP 4 ;
                         CAR ;
                         CONTRACT %receivePrice (pair (nat %tokenId) (nat %priceF)) ;
                         IF_NONE { FAILWITH } { SWAP ; DROP } ;
                         PUSH mutez 0 ;
-                        DIG 3 ;
-                        DIG 3 ;
+                        PUSH nat 1000000000000000000000000000000000000 ;
+                        PUSH nat 1 ;
+                        MUL ;
+                        DIG 4 ;
                         PAIR ;
                         TRANSFER_TOKENS ;
                         CONS } ;
-                 SWAP ;
+                 DIG 2 ;
                  DIG 3 ;
                  DIG 4 ;
-                 DIG 5 ;
-                 DIG 6 ;
-                 DROP 5 ;
+                 DROP 3 ;
                  PAIR }
-               { DIG 3 ; DIG 4 ; DIG 5 ; DIG 6 ; DROP 5 ; SWAP ; PAIR } }
+               { DIG 3 ; DIG 4 ; DIG 5 ; DROP 4 ; SWAP ; PAIR } }
            { DIG 3 ;
              DIG 4 ;
              DIG 5 ;
-             DIG 6 ;
-             DROP 4 ;
+             DROP 3 ;
              IF_LEFT { DROP ; SWAP ; PAIR } { DROP ; SWAP ; PAIR } } } }
 
