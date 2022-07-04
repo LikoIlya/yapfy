@@ -1,14 +1,10 @@
 {
-  "2": {
-    "name": "BTC",
+  "12": {
+    "name": "BTCUSD",
     "decimals": "100000000"
   },
-  "3":{
-    "name": "DEFI",
-    "decimals": "1000000000000"
-  },
-  "8": {
-    "name": "XTZ",
+  "11": {
+    "name": "XTZUSD",
     "decimals": "1000000"
   }
 }
