@@ -18,6 +18,10 @@ const uOracleCode = fs.readFileSync("./tests/contracts/ubinetic.tz").toString();
 import uOracleStorage, {
   tokenPrices as uTokenPrices,
 } from "./contracts/ubinetic_storage";
+const uOldOracleCode = fs.readFileSync("./tests/contracts/ubinetic_old.tz").toString();
+import uOldOracleStorage, {
+  tokenPrices as uOldTokenPrices,
+} from "./contracts/ubinetic_old_storage";
 const cOracleCode = fs.readFileSync("./tests/contracts/ctez.tz").toString();
 import cOracleStorage, {
   tokenPrices as cTokenPrices,
@@ -26,6 +30,7 @@ const wTokenPrices = { wTez: new BigNumber(1) };
 import { Contract, MichelsonMap, TezosToolkit } from "@taquito/taquito";
 import hTokens from "../storage/harbinger_tokens.json";
 import uTokens from "../storage/ubinetic_tokens.json";
+import uOldTokens from "../storage/ubinetic_old_tokens.json";
 import cTokens from "../storage/ctez_tokens.json";
 import wTokens from "../storage/wtez_tokens.json";
 import { failCase, TezosAddress } from "../utils/helpers";
@@ -37,6 +42,7 @@ describe("Router", () => {
   let responder: Contract;
   let hOracle: Contract;
   let uOracle: Contract;
+  let uOldOracle: Contract;
   let cOracle: Contract;
 
   beforeAll(async () => {
@@ -363,16 +369,143 @@ describe("Router", () => {
       ).oraclePrecision;
       for (const tokenId in uTokens) {
         let exptedPrice =
-          uTokens[tokenId].name == "XTZ"
+          uTokens[tokenId].name == "XTZUSD"
             ? new BigNumber(parserPrecision).dividedBy(
-                uTokenPrices[uTokens[tokenId].name]
+                uTokenPrices[uTokens[tokenId].name].price
               )
-            : new BigNumber(uTokenPrices[uTokens[tokenId].name]).dividedBy(
-                uTokenPrices.XTZ
+            : new BigNumber(uTokenPrices[uTokens[tokenId].name].price).dividedBy(
+                uTokenPrices.XTZUSD.price
               );
         exptedPrice = exptedPrice
           .multipliedBy(proxyPrecision)
           .dividedToIntegerBy(uTokens[tokenId].decimals);
+        expect(prices.get(tokenId).toNumber()).toBeCloseTo(
+          exptedPrice.toNumber(),
+          -3
+        );
+      }
+    });
+  });
+
+  describe("Ubinetic old example oracle (view)", () => {
+    const parserType = "Ubinetic_old";
+    beforeAll(async () => {
+      const uOp = await Tezos.contract.originate({
+        code: uOldOracleCode,
+        storage: uOldOracleStorage,
+      });
+      await confirmOperation(Tezos, uOp.hash);
+      uOldOracle = await Tezos.contract.at(uOp.contractAddress);
+      console.log("uOldOracle:", uOldOracle.address);
+    });
+
+    it("Add parser bytes to storage", async () => {
+      const initFunction = fs
+        .readFileSync("./build/bytes/ubinetic_old.hex")
+        .toString();
+      let parserOp = await router.methodsObject
+        .addParserType({
+          initFunction,
+          parserType,
+        })
+        .send();
+      await confirmOperation(Tezos, parserOp.hash);
+      const parserBytes = await (
+        (await router.storage()) as typeof storage
+      ).parserBytes.get(parserType);
+      expect(parserBytes).toEqual(initFunction);
+    });
+    it("Connect oracle with proxy by parser", async () => {
+      const parserOp = await router.methodsObject
+        .connectOracle({
+          oracle: uOldOracle.address,
+          oraclePrecision: 1_000_000,
+          timestampLimit: 15000,
+          parserType,
+        })
+        .send();
+      await confirmOperation(Tezos, parserOp.hash);
+      const parserAddress = await (
+        (await router.storage()) as typeof storage
+      ).oracleParser.get(uOldOracle.address);
+      expect(parserAddress).toMatch("KT1");
+      const parser = await Tezos.contract.at(parserAddress);
+      expect(parser.entrypoints.entrypoints).toHaveProperty("getPrice");
+      expect(parser.entrypoints.entrypoints).toHaveProperty(
+        "setTimestampLimit"
+      );
+      expect(parser.entrypoints.entrypoints).toHaveProperty("updateAsset");
+      expect(parser.entrypoints.entrypoints).toHaveProperty("updateOracle");
+      const parserStorage = await ((await parser.storage()) as {
+        router: TezosAddress;
+        oracle: TezosAddress;
+        oraclePrecision: BigNumber.Value;
+        timestampLimit: BigNumber.Value;
+      });
+      expect(parserStorage.router).toEqual(router.address);
+      expect(parserStorage.oracle).toEqual(uOldOracle.address);
+      expect(parserStorage.oraclePrecision.toString()).toEqual(
+        new BigNumber(1_000_000).toString()
+      );
+      expect(parserStorage.timestampLimit.toString()).toEqual(
+        new BigNumber(15000).toString()
+      );
+    });
+    it("Add supported tokens to proxy", async () => {
+      const parserAddress = await (
+        (await router.storage()) as typeof storage
+      ).oracleParser.get(uOldOracle.address);
+      let batch = await Tezos.contract.batch();
+      for (var tokenId in uOldTokens) {
+        const assetName = uOldTokens[tokenId].name;
+        const decimals = uOldTokens[tokenId].decimals;
+        batch = await batch.withContractCall(
+          router.methodsObject.updateAsset({
+            tokenId,
+            assetName,
+            decimals,
+            oracle: uOldOracle.address,
+          })
+        );
+      }
+      const op = await batch.send();
+      await confirmOperation(Tezos, op.hash);
+      console.log("uOldOracle tokens mapped");
+      for (var tokenId in uOldTokens) {
+        const tokenParserAddress = await (
+          (await router.storage()) as typeof storage
+        ).tokenIdToParser.get(tokenId);
+        expect(parserAddress).toEqual(tokenParserAddress);
+      }
+    });
+    it("Get tokens prices", async () => {
+      const op = await router.methods.getPrice(Object.keys(uOldTokens)).send();
+      await confirmOperation(Tezos, op.hash);
+      const prices = (
+        (await responder.storage()) as {
+          priceF: MichelsonMap<string, BigNumber>;
+        }
+      ).priceF;
+      const parserAddress = await (
+        (await router.storage()) as typeof storage
+      ).oracleParser.get(uOldOracle.address);
+      expect(parserAddress).toMatch("KT1");
+      const parser = await Tezos.contract.at(parserAddress);
+      const parserPrecision = (
+        (await parser.storage()) as { oraclePrecision: BigNumber.Value }
+      ).oraclePrecision;
+      for (const tokenId in uOldTokens) {
+        let exptedPrice =
+        uOldTokens[tokenId].name == "XTZ"
+            ? new BigNumber(parserPrecision).dividedBy(
+                uOldTokenPrices[uOldTokens[tokenId].name]
+              )
+            : new BigNumber(uOldTokenPrices[uOldTokens[tokenId].name]).dividedBy(
+                uOldTokenPrices.XTZ
+              );
+        exptedPrice = exptedPrice
+          .multipliedBy(proxyPrecision)
+          .dividedToIntegerBy(uOldTokens[tokenId].decimals);
         expect(prices.get(tokenId).toNumber()).toBeCloseTo(
           exptedPrice.toNumber(),
           -3
@@ -641,10 +774,11 @@ describe("Router", () => {
   });
 
   describe("All setted tokens", () => {
-    const all_tokens = { ...hTokens, ...uTokens, ...cTokens, ...wTokens };
+    const all_tokens = { ...hTokens, ...uTokens, ...uOldTokens, ...cTokens, ...wTokens };
     const all_prices = {
       ...hTokenPrices,
       ...uTokenPrices,
+      ...uOldTokenPrices,
       ...cTokenPrices,
       ...wTokenPrices,
     };
@@ -685,17 +819,27 @@ describe("Router", () => {
           (await parser.storage()) as { oraclePrecision: BigNumber.Value }
         ).oraclePrecision;
         let exptedPrice = new BigNumber(0);
-        if (Object({ ...hTokens, ...uTokens }).hasOwnProperty(tokenId)) {
-          if ((all_tokens[tokenId].name as string).startsWith("XTZ"))
-            // if Call by XTZ price - USD token, invert price.
-            exptedPrice = new BigNumber(parserPrecision).dividedBy(
-              all_prices[all_tokens[tokenId].name]
-            );
-          else {
-            exptedPrice = new BigNumber(all_prices[all_tokens[tokenId].name]);
-            if (Object(hTokens).hasOwnProperty(tokenId))
-              exptedPrice = exptedPrice.dividedBy(all_prices["XTZ-USD"]);
-            else exptedPrice = exptedPrice.dividedBy(all_prices["XTZ"]);
+        if (Object({ ...hTokens, ...uTokens, ...uOldTokens }).hasOwnProperty(tokenId)) {
+          if (Object(uTokens).hasOwnProperty(tokenId)) {
+            exptedPrice = all_tokens[tokenId].name == "XTZUSD" ?
+                new BigNumber(parserPrecision).dividedBy(
+                  all_prices[all_tokens[tokenId].name].price
+                ) :
+                new BigNumber(all_prices[all_tokens[tokenId].name].price).dividedBy(all_prices["XTZUSD"].price);
+          }
+          else if (Object(hTokens).hasOwnProperty(tokenId)) {
+              exptedPrice = all_tokens[tokenId].name == "XTZ-USD" ?
+                new BigNumber(parserPrecision).dividedBy(
+                  all_prices[all_tokens[tokenId].name]
+                ) :
+                new BigNumber(all_prices[all_tokens[tokenId].name]).dividedBy(all_prices["XTZ-USD"]);
+          }
+          else if (Object(uOldTokens).hasOwnProperty(tokenId)) {
+            exptedPrice = all_tokens[tokenId].name == "XTZ" ?
+                new BigNumber(parserPrecision).dividedBy(
+                  all_prices[all_tokens[tokenId].name]
+                ) :
+                new BigNumber(all_prices[all_tokens[tokenId].name]).dividedBy(all_prices["XTZ"]);
           }
         } else if (Object({ ...cTokens, ...wTokens }).hasOwnProperty(tokenId))
           // oracles returns prices in XTZ
