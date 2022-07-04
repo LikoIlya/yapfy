@@ -16,7 +16,7 @@
            (pair (option nat) string)
            nat
            { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
-         PUSH string "XTZUSD" ;
+         PUSH string "XTZ" ;
          DIG 4 ;
          UNPAIR ;
          NIL operation ;
