@@ -75,6 +75,8 @@ function receiveParsedPrice(
                         : list(operation) is
   block {
     require(Big_map.mem(Tezos.sender, s.parserOracle), Errors.notParser);
+    const parser = unwrap(s.tokenIdToParser[params.tokenId], Errors.unknownToken);
+    require(Tezos.sender = parser, Errors.notParser);
     const decimals : nat = getDecimal(params.tokenId, s.decimals);
   } with list[
       Tezos.transaction(
