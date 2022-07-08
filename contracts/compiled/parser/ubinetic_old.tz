@@ -13,40 +13,62 @@
   code { PUSH string "P_NOT_ROUTER" ;
          PUSH nat 1000000000000000000000000000000000000 ;
          LAMBDA
+           (pair bool string)
+           unit
+           { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
+         LAMBDA
            (pair (option nat) string)
            nat
            { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
          PUSH string "XTZ" ;
-         DIG 4 ;
+         DIG 5 ;
          UNPAIR ;
+         PUSH string "DONT_SEND_TEZOS" ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         EQ ;
+         PAIR ;
+         DUP 6 ;
+         SWAP ;
+         EXEC ;
+         DROP ;
          NIL operation ;
          SWAP ;
          DUP ;
          DUG 2 ;
          IF_LEFT
            { IF_LEFT
-               { DROP ; DIG 2 }
+               { DIG 6 ; DROP 2 ; DIG 2 }
                { DIG 3 ;
                  SWAP ;
-                 DUP 8 ;
+                 DUP 9 ;
                  DUP 3 ;
                  CAR ;
                  SENDER ;
                  COMPARE ;
                  EQ ;
-                 IF { DROP } { FAILWITH } ;
+                 PAIR ;
+                 DIG 7 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
                  INT ;
                  UPDATE 7 } }
            { IF_LEFT
                { DIG 3 ;
                  SWAP ;
-                 DUP 8 ;
+                 DUP 9 ;
                  DUP 3 ;
                  CAR ;
                  SENDER ;
                  COMPARE ;
                  EQ ;
-                 IF { DROP } { FAILWITH } ;
+                 PAIR ;
+                 DIG 7 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
                  SWAP ;
                  DUP ;
                  GET 9 ;
@@ -72,13 +94,17 @@
                  UPDATE 11 }
                { DIG 3 ;
                  SWAP ;
-                 DUP 8 ;
+                 DUP 9 ;
                  DUP 3 ;
                  CAR ;
                  SENDER ;
                  COMPARE ;
                  EQ ;
-                 IF { DROP } { FAILWITH } ;
+                 PAIR ;
+                 DIG 7 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
                  DUP ;
                  DUG 2 ;
                  CAR ;

@@ -19,6 +19,16 @@
            { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
          DIG 4 ;
          UNPAIR ;
+         PUSH string "DONT_SEND_TEZOS" ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         EQ ;
+         PAIR ;
+         DUP 4 ;
+         SWAP ;
+         EXEC ;
+         DROP ;
          NIL operation ;
          SWAP ;
          DUP ;

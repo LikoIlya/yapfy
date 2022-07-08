@@ -1,10 +1,16 @@
 const precision = 1_000_000_000_000_000_000_000_000_000_000_000_000n;
+const non_tez_operation_error: string = "DONT_SEND_TEZOS";
 
 function require(
   const param           : bool;
   const error           : string)
                         : unit is
   assert_with_error(param, error)
+
+function non_tez_operation(
+  const _               : unit)
+                        : unit is
+  require(Tezos.amount = 0mutez, non_tez_operation_error)
 
 function check_permission(
   const address_        : address;

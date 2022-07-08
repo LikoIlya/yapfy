@@ -12,6 +12,7 @@ type parserAction       is
   var s                 : parserStorage)
                         : parserReturn is
   block {
+    non_tez_operation(Unit);
     const no_operations: list(operation) = nil;
     s := case p of [
       | SetTimestampLimit(limit)  -> setTimeLimit(limit, s)

@@ -12,6 +12,7 @@ function main(
   var s                 : routerStorage)
                         : routerReturn is
   block {
+    non_tez_operation(Unit);
     s := case p of [
       | SetProxyAdmin(params)     -> setAdmin(params, s)
       | ApproveProxyAdmin         -> approveAdmin(s)
