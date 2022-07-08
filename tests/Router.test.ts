@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import fs from "fs";
-import { Tezos, signerAlice, alice, signerBob } from "./utils/cli";
+import { Tezos, signerAlice, alice, signerBob, bob } from "./utils/cli";
 import { michelson as routerCode } from "../build/router.json";
 import { confirmOperation } from "../utils/confirmation";
 import storage from "./storage/router";
@@ -18,7 +18,9 @@ const uOracleCode = fs.readFileSync("./tests/contracts/ubinetic.tz").toString();
 import uOracleStorage, {
   tokenPrices as uTokenPrices,
 } from "./contracts/ubinetic_storage";
-const uOldOracleCode = fs.readFileSync("./tests/contracts/ubinetic_old.tz").toString();
+const uOldOracleCode = fs
+  .readFileSync("./tests/contracts/ubinetic_old.tz")
+  .toString();
 import uOldOracleStorage, {
   tokenPrices as uOldTokenPrices,
 } from "./contracts/ubinetic_old_storage";
@@ -373,9 +375,9 @@ describe("Router", () => {
             ? new BigNumber(parserPrecision).dividedBy(
                 uTokenPrices[uTokens[tokenId].name].price
               )
-            : new BigNumber(uTokenPrices[uTokens[tokenId].name].price).dividedBy(
-                uTokenPrices.XTZUSD.price
-              );
+            : new BigNumber(
+                uTokenPrices[uTokens[tokenId].name].price
+              ).dividedBy(uTokenPrices.XTZUSD.price);
         exptedPrice = exptedPrice
           .multipliedBy(proxyPrecision)
           .dividedToIntegerBy(uTokens[tokenId].decimals);
@@ -496,13 +498,13 @@ describe("Router", () => {
       ).oraclePrecision;
       for (const tokenId in uOldTokens) {
         let exptedPrice =
-        uOldTokens[tokenId].name == "XTZ"
+          uOldTokens[tokenId].name == "XTZ"
             ? new BigNumber(parserPrecision).dividedBy(
                 uOldTokenPrices[uOldTokens[tokenId].name]
               )
-            : new BigNumber(uOldTokenPrices[uOldTokens[tokenId].name]).dividedBy(
-                uOldTokenPrices.XTZ
-              );
+            : new BigNumber(
+                uOldTokenPrices[uOldTokens[tokenId].name]
+              ).dividedBy(uOldTokenPrices.XTZ);
         exptedPrice = exptedPrice
           .multipliedBy(proxyPrecision)
           .dividedToIntegerBy(uOldTokens[tokenId].decimals);
@@ -774,7 +776,13 @@ describe("Router", () => {
   });
 
   describe("All setted tokens", () => {
-    const all_tokens = { ...hTokens, ...uTokens, ...uOldTokens, ...cTokens, ...wTokens };
+    const all_tokens = {
+      ...hTokens,
+      ...uTokens,
+      ...uOldTokens,
+      ...cTokens,
+      ...wTokens,
+    };
     const all_prices = {
       ...hTokenPrices,
       ...uTokenPrices,
@@ -819,27 +827,38 @@ describe("Router", () => {
           (await parser.storage()) as { oraclePrecision: BigNumber.Value }
         ).oraclePrecision;
         let exptedPrice = new BigNumber(0);
-        if (Object({ ...hTokens, ...uTokens, ...uOldTokens }).hasOwnProperty(tokenId)) {
+        if (
+          Object({ ...hTokens, ...uTokens, ...uOldTokens }).hasOwnProperty(
+            tokenId
+          )
+        ) {
           if (Object(uTokens).hasOwnProperty(tokenId)) {
-            exptedPrice = all_tokens[tokenId].name == "XTZUSD" ?
-                new BigNumber(parserPrecision).dividedBy(
-                  all_prices[all_tokens[tokenId].name].price
-                ) :
-                new BigNumber(all_prices[all_tokens[tokenId].name].price).dividedBy(all_prices["XTZUSD"].price);
-          }
-          else if (Object(hTokens).hasOwnProperty(tokenId)) {
-              exptedPrice = all_tokens[tokenId].name == "XTZ-USD" ?
-                new BigNumber(parserPrecision).dividedBy(
-                  all_prices[all_tokens[tokenId].name]
-                ) :
-                new BigNumber(all_prices[all_tokens[tokenId].name]).dividedBy(all_prices["XTZ-USD"]);
-          }
-          else if (Object(uOldTokens).hasOwnProperty(tokenId)) {
-            exptedPrice = all_tokens[tokenId].name == "XTZ" ?
-                new BigNumber(parserPrecision).dividedBy(
-                  all_prices[all_tokens[tokenId].name]
-                ) :
-                new BigNumber(all_prices[all_tokens[tokenId].name]).dividedBy(all_prices["XTZ"]);
+            exptedPrice =
+              all_tokens[tokenId].name == "XTZUSD"
+                ? new BigNumber(parserPrecision).dividedBy(
+                    all_prices[all_tokens[tokenId].name].price
+                  )
+                : new BigNumber(
+                    all_prices[all_tokens[tokenId].name].price
+                  ).dividedBy(all_prices["XTZUSD"].price);
+          } else if (Object(hTokens).hasOwnProperty(tokenId)) {
+            exptedPrice =
+              all_tokens[tokenId].name == "XTZ-USD"
+                ? new BigNumber(parserPrecision).dividedBy(
+                    all_prices[all_tokens[tokenId].name]
+                  )
+                : new BigNumber(all_prices[all_tokens[tokenId].name]).dividedBy(
+                    all_prices["XTZ-USD"]
+                  );
+          } else if (Object(uOldTokens).hasOwnProperty(tokenId)) {
+            exptedPrice =
+              all_tokens[tokenId].name == "XTZ"
+                ? new BigNumber(parserPrecision).dividedBy(
+                    all_prices[all_tokens[tokenId].name]
+                  )
+                : new BigNumber(all_prices[all_tokens[tokenId].name]).dividedBy(
+                    all_prices["XTZ"]
+                  );
           }
         } else if (Object({ ...cTokens, ...wTokens }).hasOwnProperty(tokenId))
           // oracles returns prices in XTZ
@@ -854,6 +873,151 @@ describe("Router", () => {
           -3
         );
       }
+    });
+  });
+
+  describe("Admin methods", () => {
+    it("update yToken", async () => {
+      const initYToken = (
+        (await router.storage()) as {
+          yToken: string;
+        }
+      ).yToken;
+      expect(initYToken).not.toEqual(bob.pkh);
+      let op = await router.methods.updateYToken(bob.pkh).send();
+      await confirmOperation(Tezos, op.hash);
+      let settedYToken = (
+        (await router.storage()) as {
+          yToken: string;
+        }
+      ).yToken;
+      expect(settedYToken).toEqual(bob.pkh);
+      op = await router.methods.updateYToken(responder.address).send();
+      await confirmOperation(Tezos, op.hash);
+      settedYToken = (
+        (await router.storage()) as {
+          yToken: string;
+        }
+      ).yToken;
+      expect(settedYToken).toEqual(responder.address);
+      expect(settedYToken).not.toEqual(bob.pkh);
+    });
+
+    it("setTimeLimit", async () => {
+      const newLimit = 20;
+      const parserAddress = await (
+        (await router.storage()) as typeof storage
+      ).oracleParser.get(hOracle.address);
+      const parser = await Tezos.contract.at(parserAddress);
+      let parserLimit = (
+        (await parser.storage()) as { timestampLimit: BigNumber.Value }
+      ).timestampLimit;
+      expect(new BigNumber(parserLimit)).not.toEqual(new BigNumber(newLimit));
+      let op = await router.methods
+        .setTimeLimit(newLimit, parserAddress)
+        .send();
+      await confirmOperation(Tezos, op.hash);
+      parserLimit = (
+        (await parser.storage()) as { timestampLimit: BigNumber.Value }
+      ).timestampLimit;
+      expect(new BigNumber(parserLimit)).toEqual(new BigNumber(newLimit));
+    });
+
+    it("updateOracle", async () => {
+      const newLimit = new BigNumber("100000000");
+      const newPrec = new BigNumber("0");
+      const tmpOracle = bob.pkh;
+      const parserAddress = await (
+        (await router.storage()) as typeof storage
+      ).oracleParser.get(hOracle.address);
+      const parser = await Tezos.contract.at(parserAddress);
+      let parserOracleData = (await parser.storage()) as {
+        oracle: string;
+        oraclePrecision: BigNumber.Value;
+        timestampLimit: BigNumber.Value;
+      };
+      expect(parserOracleData.oracle).toEqual(hOracle.address);
+      expect(parserOracleData.oracle).not.toEqual(tmpOracle);
+      expect(new BigNumber(parserOracleData.oraclePrecision)).not.toEqual(
+        newPrec
+      );
+      expect(new BigNumber(parserOracleData.timestampLimit)).not.toEqual(
+        newLimit
+      );
+
+      let op = await router.methodsObject
+        .updateOracle({
+          oracle: tmpOracle,
+          oraclePrecision: newPrec,
+          timestampLimit: newLimit,
+          parser: parserAddress,
+        })
+        .send();
+      await confirmOperation(Tezos, op.hash);
+      let settedParserOracleData = (await parser.storage()) as {
+        oracle: string;
+        oraclePrecision: BigNumber.Value;
+        timestampLimit: BigNumber.Value;
+      };
+      expect(settedParserOracleData.oracle).toEqual(tmpOracle);
+      expect(new BigNumber(settedParserOracleData.oraclePrecision)).toEqual(
+        newPrec
+      );
+      expect(new BigNumber(settedParserOracleData.timestampLimit)).toEqual(
+        newLimit
+      );
+      op = await router.methodsObject
+        .updateOracle({
+          ...parserOracleData,
+          parser: parserAddress,
+        })
+        .send();
+      await confirmOperation(Tezos, op.hash);
+      settedParserOracleData = (await parser.storage()) as {
+        oracle: string;
+        oraclePrecision: BigNumber.Value;
+        timestampLimit: BigNumber.Value;
+      };
+      expect(parserOracleData.oracle).toEqual(settedParserOracleData.oracle);
+      expect(new BigNumber(parserOracleData.oraclePrecision)).toEqual(
+        new BigNumber(settedParserOracleData.oraclePrecision)
+      );
+      expect(new BigNumber(parserOracleData.timestampLimit)).toEqual(
+        new BigNumber(settedParserOracleData.timestampLimit)
+      );
+    });
+
+    it("change admin", async () => {
+      const initAdminConf = (
+        (await router.storage()) as {
+          admin: string;
+          admin_candidate?: string;
+        }
+      );
+      expect(initAdminConf.admin).not.toEqual(bob.pkh);
+      expect(initAdminConf.admin_candidate).toBeNull();
+      let op = await router.methods.setProxyAdmin(bob.pkh).send();
+      await confirmOperation(Tezos, op.hash);
+      let settedAdminConf = (
+        (await router.storage()) as {
+          admin: string;
+          admin_candidate?: string;
+        }
+      );
+      expect(settedAdminConf.admin_candidate).toEqual(bob.pkh);
+      const bobsTezos = new TezosToolkit(Tezos.rpc);
+      bobsTezos.setSignerProvider(signerBob);
+      const bobsRouter = await bobsTezos.contract.at(router.address);
+      op = await bobsRouter.methods.approveProxyAdmin().send();
+      await confirmOperation(Tezos, op.hash);
+      settedAdminConf = (
+        (await router.storage()) as {
+          admin: string;
+          admin_candidate?: string;
+        }
+      );
+      expect(settedAdminConf.admin).toEqual(bob.pkh);
+      expect(settedAdminConf.admin_candidate).toBeNull();
     });
   });
 });
