@@ -13,11 +13,12 @@
   code { PUSH string "P_NOT_ROUTER" ;
          PUSH string "cTez_ONLY" ;
          PUSH string "cTez" ;
+         NIL operation ;
          LAMBDA
            (pair bool string)
            unit
            { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
-         DIG 4 ;
+         DIG 5 ;
          UNPAIR ;
          PUSH string "DONT_SEND_TEZOS" ;
          PUSH mutez 0 ;
@@ -29,106 +30,9 @@
          SWAP ;
          EXEC ;
          DROP ;
-         NIL operation ;
-         SWAP ;
-         DUP ;
-         DUG 2 ;
          IF_LEFT
            { IF_LEFT
-               { IF_LEFT { DROP ; DIG 2 } { DROP ; DIG 2 } }
-               { IF_LEFT
-                   { DIG 3 ;
-                     SWAP ;
-                     DUP 8 ;
-                     DUP 3 ;
-                     CAR ;
-                     SENDER ;
-                     COMPARE ;
-                     EQ ;
-                     PAIR ;
-                     DUP 6 ;
-                     SWAP ;
-                     EXEC ;
-                     DROP ;
-                     INT ;
-                     UPDATE 7 }
-                   { DIG 3 ;
-                     SWAP ;
-                     DUP 8 ;
-                     DUP 3 ;
-                     CAR ;
-                     SENDER ;
-                     COMPARE ;
-                     EQ ;
-                     PAIR ;
-                     DUP 6 ;
-                     SWAP ;
-                     EXEC ;
-                     DROP ;
-                     DUP 7 ;
-                     DUP 7 ;
-                     DUP 3 ;
-                     CAR ;
-                     COMPARE ;
-                     EQ ;
-                     PAIR ;
-                     DUP 6 ;
-                     SWAP ;
-                     EXEC ;
-                     DROP ;
-                     SWAP ;
-                     DUP ;
-                     GET 9 ;
-                     DUP 3 ;
-                     CAR ;
-                     DUP 4 ;
-                     CDR ;
-                     SWAP ;
-                     SOME ;
-                     SWAP ;
-                     UPDATE ;
-                     UPDATE 9 ;
-                     DUP ;
-                     GET 11 ;
-                     DUP 3 ;
-                     CDR ;
-                     DIG 3 ;
-                     CAR ;
-                     SWAP ;
-                     SOME ;
-                     SWAP ;
-                     UPDATE ;
-                     UPDATE 11 } } }
-           { DIG 3 ;
-             SWAP ;
-             DUP 8 ;
-             DUP 3 ;
-             CAR ;
-             SENDER ;
-             COMPARE ;
-             EQ ;
-             PAIR ;
-             DUP 6 ;
-             SWAP ;
-             EXEC ;
-             DROP ;
-             DUP ;
-             DUG 2 ;
-             CAR ;
-             UPDATE 3 ;
-             SWAP ;
-             DUP ;
-             DUG 2 ;
-             GET 3 ;
-             UPDATE 5 ;
-             SWAP ;
-             GET 4 ;
-             INT ;
-             UPDATE 7 } ;
-         DIG 2 ;
-         IF_LEFT
-           { IF_LEFT
-               { DIG 2 ;
+               { DIG 3 ;
                  DROP ;
                  IF_LEFT
                    { DIG 3 ;
@@ -212,11 +116,99 @@
                      TRANSFER_TOKENS ;
                      CONS ;
                      PAIR } }
-               { DIG 3 ;
-                 DIG 4 ;
-                 DIG 5 ;
-                 DIG 6 ;
-                 DROP 4 ;
-                 IF_LEFT { DROP ; SWAP ; PAIR } { DROP ; SWAP ; PAIR } } }
-           { DIG 3 ; DIG 4 ; DIG 5 ; DIG 6 ; DROP 5 ; SWAP ; PAIR } } }
+               { IF_LEFT
+                   { DIG 4 ;
+                     DIG 5 ;
+                     DROP 2 ;
+                     DIG 4 ;
+                     DUP 3 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DIG 3 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     INT ;
+                     UPDATE 7 ;
+                     SWAP ;
+                     PAIR }
+                   { DIG 6 ;
+                     DUP 3 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DUP 4 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     DIG 5 ;
+                     DIG 5 ;
+                     DUP 3 ;
+                     CAR ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DIG 3 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     SWAP ;
+                     DUP ;
+                     GET 9 ;
+                     DUP 3 ;
+                     CAR ;
+                     DUP 4 ;
+                     CDR ;
+                     SWAP ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 9 ;
+                     DUP ;
+                     GET 11 ;
+                     DUP 3 ;
+                     CDR ;
+                     DIG 3 ;
+                     CAR ;
+                     SWAP ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 11 ;
+                     SWAP ;
+                     PAIR } } }
+           { DIG 4 ;
+             DIG 5 ;
+             DROP 2 ;
+             DIG 4 ;
+             DUP 3 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             PAIR ;
+             DIG 3 ;
+             SWAP ;
+             EXEC ;
+             DROP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             UPDATE 3 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             UPDATE 5 ;
+             SWAP ;
+             GET 4 ;
+             INT ;
+             UPDATE 7 ;
+             SWAP ;
+             PAIR } } }
 
