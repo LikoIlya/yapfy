@@ -1,5 +1,6 @@
 const precision = 1_000_000_000_000_000_000_000_000_000_000_000_000n;
 const non_tez_operation_error: string = "DONT_SEND_TEZOS";
+const no_operations: list(operation) = nil;
 
 function require(
   const param           : bool;

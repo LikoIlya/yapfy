@@ -13,22 +13,18 @@ function main(
                         : routerReturn is
   block {
     non_tez_operation(Unit);
-    s := case p of [
-      | SetProxyAdmin(params)     -> setAdmin(params, s)
-      | ApproveProxyAdmin         -> approveAdmin(s)
-      | AddParserType(params)     -> addParserBytes(params, s)
-      | UpdateYToken(params)      -> updateYToken(params, s)
-      | _                         -> s
-    ];
-    const operations: list(operation) = case p of [
-      | GetPrice(params)          -> getPrice(params, s)
-      | ReceivePrice(params)      -> receiveParsedPrice(params, s)
-      | SetTimeLimit(params)      -> setTimeLimit(params, s)
-      | _                         -> nil
-    ]
   } with case p of [
+    // storage update only actions
+    | SetProxyAdmin(params)     -> (no_operations, setAdmin(params, s))
+    | ApproveProxyAdmin         -> (no_operations, approveAdmin(s))
+    | AddParserType(params)     -> (no_operations, addParserBytes(params, s))
+    | UpdateYToken(params)      -> (no_operations, updateYToken(params, s))
+    // operation create only actions
+    | GetPrice(params)          -> (getPrice(params, s), s)
+    | ReceivePrice(params)      -> (receiveParsedPrice(params, s), s)
+    | SetTimeLimit(params)      -> (setTimeLimit(params, s), s)
+    // storage update and operation create actions
     | UpdateOracle(params)      -> updateOracle(params, s)
     | UpdateAsset(params)       -> updateAsset(params, s)
     | ConnectOracle(params)     -> connectNewOracle(params, s)
-    | _                         -> (operations, s)
   ]
