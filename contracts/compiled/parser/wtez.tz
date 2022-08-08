@@ -9,7 +9,8 @@
           (int %timestampLimit)
           (big_map %assetName nat string)
           (big_map %assetId string nat)
-          (big_map %metadata string bytes)) ;
+          (big_map %metadata string bytes)
+          (option %tmp (pair (nat %price) (nat %level) (bool %updating)))) ;
   code { PUSH string "P_NOT_ROUTER" ;
          PUSH string "wTez_ONLY" ;
          NIL operation ;
