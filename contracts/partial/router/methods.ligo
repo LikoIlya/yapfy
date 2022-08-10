@@ -165,6 +165,7 @@ function connectNewOracle(
       oracle          = params.oracle;
       oraclePrecision = params.oraclePrecision;
       timestampLimit  = int(params.timestampLimit);
+      tmp             = None;
     ];
     const (operation, parser) = deployFromBytes(
       unwrap(s.parserBytes[params.parserType], Errors.noParserType),
