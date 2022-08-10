@@ -7,6 +7,33 @@
     Errors.wrongOContract
   )
 
+[@inline] function unpackTmp(const tmp: option(bytes)): tmpPrice is
+  block {
+    const data = unwrap(
+      (Bytes.unpack(unwrap(tmp, Errors.no_tmp)) : option(tmpPrice)),
+      Errors.cant_unpack_data
+    );
+  } with data
+
+[@inline] function unpackTmpOrDefault(const tmp: option(bytes)): tmpPrice is
+  block {
+    const default_data : tmpPrice = record[
+          price = 0n;
+          level = 0n;
+          updating = False;
+      ];
+    const data = unwrap(
+      (Bytes.unpack(unwrap_or(tmp, Bytes.pack(default_data))) : option(tmpPrice)),
+      Errors.cant_unpack_data
+    );
+  } with data
+
+[@inline] function packTmp(const data: option(tmpPrice)): option(bytes) is
+  case data of [
+    Some(tmp) -> Some(Bytes.pack(tmp))
+    | None -> None
+  ]
+
 
 function getPrice(
   const tokenSet        : tokenSet;
@@ -29,19 +56,16 @@ function getPrice(
       const operations = Set.fold(
         oneTokenUpd,
         tokenSet,
-        (list[Tezos.transaction(
+        (list[
+          Tezos.transaction(
             Get(xtz_usd_price_name, param),
             0mutez,
             getNormalizerContract(s.oracle)
         )] : list(operation))
       );
-      var tmp := unwrap_or(s.tmp, record[
-          price = 0n;
-          level = 0n;
-          updating = False;
-        ]);
+      var tmp := unpackTmpOrDefault(s.tmp);
       tmp.updating := True;
-  } with (operations, s with record[tmp = Some(tmp)])
+  } with (operations, s with record[tmp = packTmp(Some(tmp))])
 
 function receivePrice(
   const param           : receivePriceParams;
@@ -55,23 +79,19 @@ function receivePrice(
     const usd : bool = (assetName = xtz_usd_price_name); // if price is XTZ/USD
     var priceF : precisionValue := 0n;
     if (usd) then {
-        var data := unwrap_or(s.tmp, record[
-          price = oraclePrice;
-          level = Tezos.level;
-          updating = False;
-        ]);
-        require(data.updating, "XTZ_NOT_UPDATING");
+        var data := unpackTmpOrDefault(s.tmp);
+        require(data.updating, Errors.xtz_not_updating);
         priceF := s.oraclePrecision * precision / oraclePrice;
         data := record[
           price = oraclePrice;
           level = Tezos.level;
           updating = False;
         ];
-        s.tmp := Some(data);
+        s.tmp := packTmp(Some(data));
       }
     else {
-      const tmp = unwrap(s.tmp, "NO_TMP");
-      require(not tmp.updating, "XTZ_UPDATING");
+      const tmp = unpackTmp(s.tmp);
+      require(not tmp.updating, Errors.xtz_updating);
       require(tmp.level = Tezos.level, Errors.timestampLimit);
       priceF := oraclePrice * precision / tmp.price;
     };

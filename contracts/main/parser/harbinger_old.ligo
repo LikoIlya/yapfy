@@ -1,7 +1,6 @@
 #include "../../helpers.ligo"
 #define CALLBACK
 #import  "../../partial/parser/errors.ligo" "Errors"
-#define TMP
 #include "../../partial/parser/storage.ligo"
 #include "../../partial/parser/helpers.ligo"
 #include "../../partial/parser/methods.ligo"

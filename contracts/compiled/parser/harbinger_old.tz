@@ -10,9 +10,10 @@
           (big_map %assetName nat string)
           (big_map %assetId string nat)
           (big_map %metadata string bytes)
-          (option %tmp (pair (nat %price) (nat %level) (bool %updating)))) ;
+          (option %tmp bytes)) ;
   code { PUSH string "P_NOT_ROUTER" ;
          PUSH string "P_OLD_PRICE_RECEIVED" ;
+         PUSH string "P_CANT_UNPACK_TMP_BYTES" ;
          PUSH nat 1000000000000000000000000000000000000 ;
          NIL operation ;
          LAMBDA
@@ -20,15 +21,19 @@
            unit
            { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
          LAMBDA
-           (pair (option (pair nat nat bool)) (pair nat nat bool))
-           (pair nat nat bool)
+           (pair (option bytes) bytes)
+           bytes
            { UNPAIR ; IF_NONE {} { SWAP ; DROP } } ;
          LAMBDA
            (pair (option (contract (pair string (contract (pair string (pair timestamp nat)))))) string)
            (contract (pair string (contract (pair string (pair timestamp nat)))))
            { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
+         LAMBDA
+           (pair (option (pair nat nat bool)) string)
+           (pair nat nat bool)
+           { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
          PUSH string "XTZ-USD" ;
-         DIG 8 ;
+         DIG 10 ;
          UNPAIR ;
          PUSH string "DONT_SEND_TEZOS" ;
          PUSH mutez 0 ;
@@ -36,19 +41,19 @@
          COMPARE ;
          EQ ;
          PAIR ;
-         DUP 7 ;
+         DUP 8 ;
          SWAP ;
          EXEC ;
          DROP ;
          IF_LEFT
            { IF_LEFT
-               { DIG 6 ;
+               { DIG 7 ;
                  DROP ;
                  IF_LEFT
-                   { DIG 5 ;
-                     DIG 6 ;
+                   { DIG 6 ;
                      DIG 7 ;
-                     DIG 8 ;
+                     DIG 9 ;
+                     DIG 10 ;
                      DROP 4 ;
                      SELF %receivePrice ;
                      NIL operation ;
@@ -57,7 +62,7 @@
                      GET 3 ;
                      CONTRACT %get (pair string (contract (pair string (pair timestamp nat)))) ;
                      PAIR ;
-                     DUP 7 ;
+                     DUP 8 ;
                      SWAP ;
                      EXEC ;
                      PUSH mutez 0 ;
@@ -80,7 +85,7 @@
                             GET 3 ;
                             CONTRACT %get (pair string (contract (pair string (pair timestamp nat)))) ;
                             PAIR ;
-                            DUP 7 ;
+                            DUP 8 ;
                             SWAP ;
                             EXEC ;
                             PUSH mutez 0 ;
@@ -95,14 +100,21 @@
                             IF { DROP } { CONS } } ;
                      SWAP ;
                      DIG 3 ;
-                     DIG 4 ;
+                     DIG 5 ;
                      DROP 3 ;
+                     DIG 4 ;
                      PUSH bool False ;
                      PUSH nat 0 ;
                      PUSH nat 0 ;
                      PAIR 3 ;
-                     DUP 3 ;
+                     PACK ;
+                     DUP 4 ;
                      GET 14 ;
+                     PAIR ;
+                     DIG 5 ;
+                     SWAP ;
+                     EXEC ;
+                     UNPACK (pair (nat %price) (nat %level) (bool %updating)) ;
                      PAIR ;
                      DIG 3 ;
                      SWAP ;
@@ -112,10 +124,11 @@
                      PUSH bool True ;
                      UPDATE 4 ;
                      SOME ;
+                     IF_NONE { NONE bytes } { PACK ; SOME } ;
                      UPDATE 14 ;
                      SWAP ;
                      PAIR }
-                   { DIG 3 ;
+                   { DIG 4 ;
                      DROP ;
                      PUSH string "P_NOT_ORACLE" ;
                      DUP 3 ;
@@ -124,7 +137,7 @@
                      COMPARE ;
                      EQ ;
                      PAIR ;
-                     DUP 6 ;
+                     DUP 7 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -137,7 +150,7 @@
                      DUG 2 ;
                      CDR ;
                      CAR ;
-                     DUP 9 ;
+                     DUP 11 ;
                      DIG 2 ;
                      NOW ;
                      SUB ;
@@ -145,7 +158,7 @@
                      COMPARE ;
                      GE ;
                      PAIR ;
-                     DUP 6 ;
+                     DUP 7 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -158,19 +171,26 @@
                      DUP 3 ;
                      COMPARE ;
                      EQ ;
-                     IF { DIG 6 ;
+                     IF { DIG 8 ;
                           DROP ;
+                          DIG 7 ;
                           PUSH bool False ;
-                          LEVEL ;
-                          DUP 3 ;
+                          PUSH nat 0 ;
+                          PUSH nat 0 ;
                           PAIR 3 ;
-                          DUP 4 ;
+                          PACK ;
+                          DUP 5 ;
                           GET 14 ;
+                          PAIR ;
+                          DIG 6 ;
+                          SWAP ;
+                          EXEC ;
+                          UNPACK (pair (nat %price) (nat %level) (bool %updating)) ;
                           PAIR ;
                           DIG 4 ;
                           SWAP ;
                           EXEC ;
-                          PUSH string "XTZ_NOT_UPDATING" ;
+                          PUSH string "P_XTZ_NOT_UPDATING" ;
                           SWAP ;
                           GET 4 ;
                           PAIR ;
@@ -193,16 +213,23 @@
                           DIG 3 ;
                           SWAP ;
                           SOME ;
+                          IF_NONE { NONE bytes } { PACK ; SOME } ;
                           UPDATE 14 ;
                           SWAP ;
                           PAIR }
-                        { DIG 3 ;
+                        { DIG 4 ;
                           DROP ;
-                          PUSH string "NO_TMP" ;
-                          DUP 4 ;
+                          DIG 6 ;
+                          PUSH string "P_NO_TMP" ;
+                          DUP 5 ;
                           GET 14 ;
                           IF_NONE { FAILWITH } { SWAP ; DROP } ;
-                          PUSH string "XTZ_UPDATING" ;
+                          UNPACK (pair (nat %price) (nat %level) (bool %updating)) ;
+                          PAIR ;
+                          DIG 4 ;
+                          SWAP ;
+                          EXEC ;
+                          PUSH string "P_XTZ_UPDATING" ;
                           SWAP ;
                           DUP ;
                           DUG 2 ;
@@ -260,9 +287,11 @@
                { DIG 2 ;
                  DIG 3 ;
                  DIG 4 ;
-                 DIG 7 ;
+                 DIG 5 ;
                  DIG 8 ;
-                 DROP 5 ;
+                 DIG 9 ;
+                 DIG 10 ;
+                 DROP 7 ;
                  IF_LEFT
                    { DIG 4 ;
                      DUP 3 ;
@@ -318,9 +347,11 @@
            { DIG 2 ;
              DIG 3 ;
              DIG 4 ;
-             DIG 7 ;
+             DIG 5 ;
              DIG 8 ;
-             DROP 5 ;
+             DIG 9 ;
+             DIG 10 ;
+             DROP 7 ;
              DIG 4 ;
              DUP 3 ;
              CAR ;

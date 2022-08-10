@@ -10,7 +10,7 @@
           (big_map %assetName nat string)
           (big_map %assetId string nat)
           (big_map %metadata string bytes)
-          (option %tmp (pair (nat %price) (nat %level) (bool %updating)))) ;
+          (option %tmp bytes)) ;
   code { PUSH string "P_NOT_ROUTER" ;
          PUSH nat 1000000000000000000000000000000000000 ;
          NIL operation ;
