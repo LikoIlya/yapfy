@@ -14,6 +14,7 @@
   code { PUSH string "P_NOT_ROUTER" ;
          PUSH string "P_OLD_PRICE_RECEIVED" ;
          PUSH string "P_CANT_UNPACK_TMP_BYTES" ;
+         PUSH string "P_INVALID_STATE" ;
          PUSH nat 1000000000000000000000000000000000000 ;
          NIL operation ;
          LAMBDA
@@ -21,16 +22,12 @@
            unit
            { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
          LAMBDA
-           (pair (option bytes) bytes)
-           bytes
-           { UNPAIR ; IF_NONE {} { SWAP ; DROP } } ;
-         LAMBDA
            (pair (option (contract (pair string (contract (pair string (pair timestamp nat)))))) string)
            (contract (pair string (contract (pair string (pair timestamp nat)))))
            { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
          LAMBDA
-           (pair (option (pair nat nat bool)) string)
-           (pair nat nat bool)
+           (pair (option (pair nat nat nat (or (or unit nat) unit))) string)
+           (pair nat nat nat (or (or unit nat) unit))
            { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
          PUSH string "XTZ-USD" ;
          DIG 10 ;
@@ -41,24 +38,60 @@
          COMPARE ;
          EQ ;
          PAIR ;
-         DUP 8 ;
+         DUP 7 ;
          SWAP ;
          EXEC ;
          DROP ;
          IF_LEFT
            { IF_LEFT
-               { DIG 7 ;
+               { DIG 6 ;
                  DROP ;
                  IF_LEFT
                    { DIG 6 ;
-                     DIG 7 ;
                      DIG 9 ;
                      DIG 10 ;
-                     DROP 4 ;
+                     DROP 3 ;
+                     DIG 7 ;
+                     UNIT ;
+                     LEFT nat ;
+                     LEFT unit ;
+                     PUSH nat 0 ;
+                     PUSH nat 0 ;
+                     PUSH nat 0 ;
+                     PAIR 4 ;
+                     PACK ;
+                     DUP 4 ;
+                     GET 14 ;
+                     IF_NONE {} { SWAP ; DROP } ;
+                     UNPACK
+                       (pair (nat %price)
+                             (nat %level)
+                             (nat %size)
+                             (or %state (or (unit %idle) (nat %waitingAssetPrice)) (unit %waitingUsdPrice))) ;
+                     PAIR ;
+                     DIG 4 ;
+                     SWAP ;
+                     EXEC ;
+                     DUP ;
+                     GET 6 ;
+                     IF_LEFT
+                       { IF_LEFT { DIG 7 ; DROP 2 } { DROP ; DIG 6 ; FAILWITH } }
+                       { DROP ; DIG 6 ; FAILWITH } ;
+                     PUSH string "P_EMPTY_SET" ;
+                     PUSH nat 0 ;
+                     DUP 4 ;
+                     SIZE ;
+                     COMPARE ;
+                     GT ;
+                     PAIR ;
+                     DIG 6 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
                      SELF %receivePrice ;
                      NIL operation ;
                      PUSH string "P_NOT_ORACLE_CONTRACT" ;
-                     DUP 5 ;
+                     DUP 6 ;
                      GET 3 ;
                      CONTRACT %get (pair string (contract (pair string (pair timestamp nat)))) ;
                      PAIR ;
@@ -67,13 +100,13 @@
                      EXEC ;
                      PUSH mutez 0 ;
                      DUP 4 ;
-                     DUP 8 ;
+                     DUP 9 ;
                      PAIR ;
                      TRANSFER_TOKENS ;
                      CONS ;
-                     DIG 2 ;
+                     DIG 3 ;
                      ITER { SWAP ;
-                            DUP 4 ;
+                            DUP 5 ;
                             GET 9 ;
                             DIG 2 ;
                             PUSH string "STRING_NOT_DEFINED" ;
@@ -81,7 +114,7 @@
                             GET ;
                             IF_NONE { FAILWITH } { SWAP ; DROP } ;
                             PUSH string "P_NOT_ORACLE_CONTRACT" ;
-                            DUP 5 ;
+                            DUP 6 ;
                             GET 3 ;
                             CONTRACT %get (pair string (contract (pair string (pair timestamp nat)))) ;
                             PAIR ;
@@ -93,36 +126,27 @@
                             DUP 4 ;
                             PAIR ;
                             TRANSFER_TOKENS ;
-                            DUP 6 ;
+                            DUP 7 ;
                             DIG 2 ;
                             COMPARE ;
                             EQ ;
                             IF { DROP } { CONS } } ;
                      SWAP ;
-                     DIG 3 ;
+                     DIG 4 ;
                      DIG 5 ;
                      DROP 3 ;
-                     DIG 4 ;
-                     PUSH bool False ;
-                     PUSH nat 0 ;
-                     PUSH nat 0 ;
-                     PAIR 3 ;
-                     PACK ;
-                     DUP 4 ;
-                     GET 14 ;
-                     PAIR ;
-                     DIG 5 ;
                      SWAP ;
-                     EXEC ;
-                     UNPACK (pair (nat %price) (nat %level) (bool %updating)) ;
-                     PAIR ;
-                     DIG 3 ;
-                     SWAP ;
-                     EXEC ;
+                     UNIT ;
+                     RIGHT (or unit nat) ;
+                     UPDATE 6 ;
+                     PUSH nat 1 ;
+                     DUP 3 ;
+                     SIZE ;
+                     SUB ;
+                     ABS ;
+                     UPDATE 5 ;
                      DIG 2 ;
                      SWAP ;
-                     PUSH bool True ;
-                     UPDATE 4 ;
                      SOME ;
                      IF_NONE { NONE bytes } { PACK ; SOME } ;
                      UPDATE 14 ;
@@ -137,7 +161,7 @@
                      COMPARE ;
                      EQ ;
                      PAIR ;
-                     DUP 7 ;
+                     DUP 6 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -158,7 +182,7 @@
                      COMPARE ;
                      GE ;
                      PAIR ;
-                     DUP 7 ;
+                     DUP 6 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -171,94 +195,114 @@
                      DUP 3 ;
                      COMPARE ;
                      EQ ;
-                     IF { DIG 8 ;
-                          DROP ;
-                          DIG 7 ;
-                          PUSH bool False ;
-                          PUSH nat 0 ;
-                          PUSH nat 0 ;
-                          PAIR 3 ;
-                          PACK ;
-                          DUP 5 ;
-                          GET 14 ;
-                          PAIR ;
-                          DIG 6 ;
-                          SWAP ;
-                          EXEC ;
-                          UNPACK (pair (nat %price) (nat %level) (bool %updating)) ;
-                          PAIR ;
-                          DIG 4 ;
-                          SWAP ;
-                          EXEC ;
-                          PUSH string "P_XTZ_NOT_UPDATING" ;
-                          SWAP ;
-                          GET 4 ;
-                          PAIR ;
-                          DIG 4 ;
-                          SWAP ;
-                          EXEC ;
-                          DROP ;
-                          DUP ;
-                          DIG 4 ;
-                          DUP 5 ;
-                          GET 5 ;
-                          MUL ;
-                          EDIV ;
-                          IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
-                          CAR ;
-                          PUSH bool False ;
-                          LEVEL ;
-                          DIG 3 ;
-                          PAIR 3 ;
-                          DIG 3 ;
-                          SWAP ;
-                          SOME ;
-                          IF_NONE { NONE bytes } { PACK ; SOME } ;
-                          UPDATE 14 ;
-                          SWAP ;
-                          PAIR }
-                        { DIG 4 ;
-                          DROP ;
+                     IF { DIG 4 ;
+                          DIG 8 ;
+                          DROP 2 ;
                           DIG 6 ;
                           PUSH string "P_NO_TMP" ;
                           DUP 5 ;
                           GET 14 ;
                           IF_NONE { FAILWITH } { SWAP ; DROP } ;
-                          UNPACK (pair (nat %price) (nat %level) (bool %updating)) ;
+                          UNPACK
+                            (pair (nat %price)
+                                  (nat %level)
+                                  (nat %size)
+                                  (or %state (or (unit %idle) (nat %waitingAssetPrice)) (unit %waitingUsdPrice))) ;
                           PAIR ;
                           DIG 4 ;
                           SWAP ;
                           EXEC ;
-                          PUSH string "P_XTZ_UPDATING" ;
+                          DUP ;
+                          GET 6 ;
+                          IF_LEFT
+                            { IF_LEFT { DROP ; DIG 5 ; FAILWITH } { DROP ; DIG 5 ; FAILWITH } }
+                            { DIG 6 ; DROP 2 } ;
                           SWAP ;
                           DUP ;
                           DUG 2 ;
-                          GET 4 ;
-                          NOT ;
-                          PAIR ;
-                          DUP 6 ;
-                          SWAP ;
-                          EXEC ;
-                          DROP ;
-                          DIG 6 ;
-                          LEVEL ;
-                          DUP 3 ;
-                          GET 3 ;
-                          COMPARE ;
-                          EQ ;
-                          PAIR ;
                           DIG 5 ;
-                          SWAP ;
-                          EXEC ;
-                          DROP ;
-                          CAR ;
-                          DIG 4 ;
-                          DIG 2 ;
+                          DUP 6 ;
+                          GET 5 ;
                           MUL ;
                           EDIV ;
                           IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                           CAR ;
+                          SWAP ;
                           DIG 2 ;
+                          UPDATE 1 ;
+                          LEVEL ;
+                          UPDATE 3 ;
+                          DIG 3 ;
+                          SWAP ;
+                          PUSH nat 0 ;
+                          RIGHT unit ;
+                          LEFT unit ;
+                          UPDATE 6 ;
+                          SOME ;
+                          IF_NONE { NONE bytes } { PACK ; SOME } ;
+                          UPDATE 14 ;
+                          SWAP ;
+                          PAIR }
+                        { DIG 7 ;
+                          PUSH string "P_NO_TMP" ;
+                          DUP 5 ;
+                          GET 14 ;
+                          IF_NONE { FAILWITH } { SWAP ; DROP } ;
+                          UNPACK
+                            (pair (nat %price)
+                                  (nat %level)
+                                  (nat %size)
+                                  (or %state (or (unit %idle) (nat %waitingAssetPrice)) (unit %waitingUsdPrice))) ;
+                          PAIR ;
+                          DIG 4 ;
+                          SWAP ;
+                          EXEC ;
+                          DUP ;
+                          GET 6 ;
+                          IF_LEFT
+                            { IF_LEFT { DROP ; DIG 6 ; FAILWITH } { DIG 7 ; DROP } }
+                            { DROP ; DIG 6 ; FAILWITH } ;
+                          DIG 7 ;
+                          LEVEL ;
+                          DUP 4 ;
+                          GET 3 ;
+                          COMPARE ;
+                          EQ ;
+                          PAIR ;
+                          DIG 6 ;
+                          SWAP ;
+                          EXEC ;
+                          DROP ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CAR ;
+                          DIG 6 ;
+                          DIG 4 ;
+                          MUL ;
+                          EDIV ;
+                          IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                          CAR ;
+                          DUP 3 ;
+                          GET 5 ;
+                          DUP 3 ;
+                          COMPARE ;
+                          EQ ;
+                          IF { SWAP ;
+                               DROP ;
+                               SWAP ;
+                               UNIT ;
+                               LEFT nat ;
+                               LEFT unit ;
+                               UPDATE 6 ;
+                               PUSH nat 0 ;
+                               UPDATE 5 }
+                             { DIG 2 ; PUSH nat 1 ; DIG 3 ; ADD ; RIGHT unit ; LEFT unit ; UPDATE 6 } ;
+                          DIG 3 ;
+                          SWAP ;
+                          SOME ;
+                          IF_NONE { NONE bytes } { PACK ; SOME } ;
+                          UPDATE 14 ;
                           SWAP ;
                           PAIR } ;
                      DUP ;
@@ -287,7 +331,7 @@
                { DIG 2 ;
                  DIG 3 ;
                  DIG 4 ;
-                 DIG 5 ;
+                 DIG 7 ;
                  DIG 8 ;
                  DIG 9 ;
                  DIG 10 ;
@@ -347,7 +391,7 @@
            { DIG 2 ;
              DIG 3 ;
              DIG 4 ;
-             DIG 5 ;
+             DIG 7 ;
              DIG 8 ;
              DIG 9 ;
              DIG 10 ;
