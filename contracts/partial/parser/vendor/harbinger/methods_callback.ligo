@@ -44,10 +44,7 @@ function getPrice(
                         : parserReturn is
   block {
     var tmp := unpackTmpOrDefault(s.tmp);
-    case tmp.state of [
-      Idle -> skip
-      | _ -> failwith(Errors.invalidState)
-    ];
+    require(tmp.state = Idle, Errors.invalidState)
     require(Set.cardinal(tokenSet) > 0n, Errors.zeroSet);
     const param : contract(receivePriceParams) = Tezos.self("%receivePrice");
     function oneTokenUpd(
@@ -87,20 +84,17 @@ function receivePrice(
     const oraclePrice = param.1.1;
     const usd : bool = (assetName = xtz_usd_price_name); // if price is XTZ/USD
     var priceF : precisionValue := 0n;
+    var tmp := unpackTmp(s.tmp);
     if (usd) then {
-        var data := unpackTmp(s.tmp);
-        case data.state of [
-          WaitingUsdPrice -> skip
-          | _ -> failwith(Errors.invalidState)
-        ];
-        priceF := s.oraclePrecision * precision / oraclePrice;
-        data.price := oraclePrice;
-        data.level := Tezos.level;
-        data.state := WaitingAssetPrice(0n);
-        s.tmp := packTmp(Some(data));
-      }
+      require(tmp.state = WaitingUsdPrice, Errors.invalidState);
+      priceF := s.oraclePrecision * precision / oraclePrice;
+      s.tmp := packTmp(Some(tmp with record [
+        price = oraclePrice;
+        level = Tezos.level;
+        state = WaitingAssetPrice(0n);
+      ]));
+    }
     else {
-      var tmp := unpackTmp(s.tmp);
       const idx = case tmp.state of [
         WaitingAssetPrice(num) -> num
         | _ -> (failwith(Errors.invalidState): nat)
