@@ -7,4 +7,5 @@ module AssetCheck is {
   const tokenId                : string = "TOKEN_ID_NOT_DEFINED";
   const cTezOnly               : string = "cTez_ONLY";
   const wTezOnly               : string = "wTez_ONLY";
+  const sirsOnly               : string = "SIRS_ONLY";
 }
