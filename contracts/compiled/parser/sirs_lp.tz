@@ -105,7 +105,10 @@
                      SWAP ;
                      EXEC ;
                      SWAP ;
+                     DUP 3 ;
+                     GET 5 ;
                      PUSH nat 1000000000000000000000000000000000000 ;
+                     MUL ;
                      EDIV ;
                      IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                      CAR ;
