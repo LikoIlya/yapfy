@@ -58,7 +58,11 @@ function receivePrice(
   block {
     mustBeOracle(s.oracle);
     const tezToUsdPrice : nat = getXTZUSDPriceView(Unit);
-    const priceF : precisionValue = precision / price / tezToUsdPrice;
+    // sirsToUSD = 1e6/price
+    // tezToUSD = tezToUsdPrice/1e6
+    // price = precision * (sirsToUSD/tezToUSD)
+    // price = precision * (1e6/price) / (tezToUsdPrice/1e6) = precision * (1e12 / price / tezToUsdPrice)
+    const priceF : precisionValue = precision * s.oraclePrecision / price / tezToUsdPrice;
     const tokenId : nat = checkAssetId(Constants.assetName, s.assetId);
     var operations : list(operation) := list[
       Tezos.transaction(
