@@ -1,0 +1,171 @@
+{ parameter
+    (or (or (set %getPrice nat) (nat %setTimestampLimit))
+        (or (pair %updateAsset (string %assetName) (nat %tokenId))
+            (pair %updateOracle (address %oracle) (nat %oraclePrecision) (nat %timestampLimit)))) ;
+  storage
+    (pair (address %router)
+          (address %oracle)
+          (nat %oraclePrecision)
+          (int %timestampLimit)
+          (big_map %assetName nat string)
+          (big_map %assetId string nat)
+          (big_map %metadata string bytes)) ;
+  code { PUSH string "P_NOT_ROUTER" ;
+         PUSH string "wTez_ONLY" ;
+         NIL operation ;
+         LAMBDA
+           (pair bool string)
+           unit
+           { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
+         DIG 4 ;
+         UNPAIR ;
+         PUSH string "DONT_SEND_TEZOS" ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         EQ ;
+         PAIR ;
+         DUP 4 ;
+         SWAP ;
+         EXEC ;
+         DROP ;
+         IF_LEFT
+           { IF_LEFT
+               { DIG 3 ;
+                 DROP ;
+                 DUP 4 ;
+                 PUSH nat 1 ;
+                 DUP 3 ;
+                 SIZE ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 DUP 4 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 NIL operation ;
+                 SWAP ;
+                 ITER { SWAP ;
+                        DUP 5 ;
+                        DUP 4 ;
+                        GET 9 ;
+                        DUP 4 ;
+                        MEM ;
+                        PAIR ;
+                        DUP 5 ;
+                        SWAP ;
+                        EXEC ;
+                        DROP ;
+                        DUP 6 ;
+                        DUP 4 ;
+                        CAR ;
+                        CONTRACT %receivePrice (pair (nat %tokenId) (nat %priceF)) ;
+                        IF_NONE { FAILWITH } { SWAP ; DROP } ;
+                        PUSH mutez 0 ;
+                        PUSH nat 1000000000000000000000000000000000000 ;
+                        PUSH nat 1 ;
+                        MUL ;
+                        DIG 4 ;
+                        PAIR ;
+                        TRANSFER_TOKENS ;
+                        CONS } ;
+                 DIG 2 ;
+                 DIG 3 ;
+                 DIG 4 ;
+                 DROP 3 ;
+                 PAIR }
+               { DIG 4 ;
+                 DROP ;
+                 DIG 4 ;
+                 DUP 3 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 INT ;
+                 UPDATE 7 ;
+                 SWAP ;
+                 PAIR } }
+           { IF_LEFT
+               { DIG 5 ;
+                 DUP 3 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 DUP 4 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 DIG 4 ;
+                 PUSH string "uXTZ" ;
+                 DUP 3 ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 GET 9 ;
+                 DUP 3 ;
+                 CAR ;
+                 DUP 4 ;
+                 CDR ;
+                 SWAP ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 9 ;
+                 DUP ;
+                 GET 11 ;
+                 DUP 3 ;
+                 CDR ;
+                 DIG 3 ;
+                 CAR ;
+                 SWAP ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 11 ;
+                 SWAP ;
+                 PAIR }
+               { DIG 4 ;
+                 DROP ;
+                 DIG 4 ;
+                 DUP 3 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 UPDATE 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 UPDATE 5 ;
+                 SWAP ;
+                 GET 4 ;
+                 INT ;
+                 UPDATE 7 ;
+                 SWAP ;
+                 PAIR } } } }
+

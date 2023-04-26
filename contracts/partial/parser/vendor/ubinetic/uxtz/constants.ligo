@@ -1,0 +1,1 @@
+const assetName = "uXTZ";
