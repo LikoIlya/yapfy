@@ -7,11 +7,15 @@
     Errors.wrongOContract
   )
 
-[@inline] function getXTZUSDPriceView(const _: unit) : nat is
-    unwrap(
-      (Tezos.call_view("get_price", Constants.baseQuoteName, Constants.genericOracle): option(nat)),
+[@inline] function getXTZUSDPriceView(const timestampLimit  : int) : nat is
+  block {
+  const response: timestamp * nat = unwrap(
+      (Tezos.call_view("getPrice", Constants.baseQuoteName, Constants.genericOracle)
+                          : option(timestamp * nat)),
       Errors.wrongOContract
     );
+    checkTimestamp(response.0, timestampLimit);
+  } with response.1;
 
 function updateAsset(
   const param           : updateAssetParams;
@@ -57,7 +61,7 @@ function receivePrice(
                         : parserReturn is
   block {
     mustBeOracle(s.oracle);
-    const tezToUsdPrice : nat = getXTZUSDPriceView(Unit);
+    const tezToUsdPrice : nat = getXTZUSDPriceView(s.timestampLimit);
     // sirsToUSD = 1e6/price
     // tezToUSD = tezToUsdPrice/1e6
     // price = precision * (sirsToUSD/tezToUSD)
