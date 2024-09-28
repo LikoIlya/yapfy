@@ -22,7 +22,7 @@ if [ "$PARSER" = "ctez" ]; then
   set +o allexport
 fi
 if [ "$PARSER" = "sirs_lp" ]; then
-  mv ./contracts/partial/parser/vendor/ubinetic/sirs_lp/constants.ligo.bak ./contracts/partial/parser/vendor/ubinetic/sirs_lp/constants.ligo
+  mv ./contracts/partial/parser/vendor/harbinger/sirs_lp/constants.ligo.bak ./contracts/partial/parser/vendor/harbinger/sirs_lp/constants.ligo
   set +o allexport
 fi
 

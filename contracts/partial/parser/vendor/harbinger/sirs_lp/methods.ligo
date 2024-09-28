@@ -17,6 +17,16 @@
     checkTimestamp(response.0, timestampLimit);
   } with response.1;
 
+[@inline] function getBTCUSDPriceView(const timestampLimit  : int) : nat is
+  block {
+  const response: timestamp * nat = unwrap(
+      (Tezos.call_view("getPrice", Constants.intermediateQuoteName, Constants.genericOracle)
+                          : option(timestamp * nat)),
+      Errors.wrongOContract
+    );
+    checkTimestamp(response.0, timestampLimit);
+  } with response.1;
+
 function updateAsset(
   const param           : updateAssetParams;
   var s                 : parserStorage)
@@ -62,11 +72,20 @@ function receivePrice(
   block {
     mustBeOracle(s.oracle);
     const tezToUsdPrice : nat = getXTZUSDPriceView(s.timestampLimit);
-    // sirsToUSD = 1e6/price
-    // tezToUSD = tezToUsdPrice/1e6
-    // price = precision * (sirsToUSD/tezToUSD)
-    // price = precision * (1e6/price) / (tezToUsdPrice/1e6) = precision * (1e12 / price / tezToUsdPrice)
-    const priceF : precisionValue = precision * s.oraclePrecision / price / tezToUsdPrice;
+    const btcToUsdPrice : nat = getBTCUSDPriceView(s.timestampLimit);
+    // We receive price as (1tzBTC to {price} SIRS) * 1e6
+    // So, to receive SIRS price to 1XTZ, we need to get prices for XTZ-USD and BTC-USD
+    // sirsToBTC = oraclePrecision/price (SIRS/BTC)
+    // tezToUSD = tezToUsdPrice/genericOraclePrecision (XTZ/USD)
+    // btcToUSD = btcToUsdPrice/genericOraclePrecision (BTC/USD)
+    // price = precision * ((sirsToBTC * btcToUSD) / tezToUSD)
+    //                      (SIRS/BTC) * (BTC/USD) / (XTZ/USD) = (SIRS/USD) / (XTZ/USD) = SIRS/XTZ
+    // price = precision * (oraclePrecision/price) * (btcToUsdPrice/genericOraclePrecision) / (tezToUsdPrice/genericOraclePrecision)
+    //         precision * (oraclePrecision * btcToUsdPrice / price) / tezToUsdPrice
+    //         precision * btcToUsdPrice * oraclePrecision / (tezToUsdPrice * price)
+    const nominator : nat = precision * btcToUsdPrice * s.oraclePrecision;
+    const denominator : nat = tezToUsdPrice * price;
+    const priceF: precisionValue = nominator / denominator;
     const tokenId : nat = checkAssetId(Constants.assetName, s.assetId);
     var operations : list(operation) := list[
       Tezos.transaction(

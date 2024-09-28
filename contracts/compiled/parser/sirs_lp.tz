@@ -14,12 +14,37 @@
          PUSH string "P_NOT_ROUTER" ;
          PUSH string "SIRS_ONLY" ;
          PUSH string "SIRS" ;
+         PUSH address "KT1KBrn1udLLrGNbQ3n1mWgMVXkr26krj6Nj" ;
          NIL operation ;
          LAMBDA
            (pair bool string)
            unit
            { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
-         DIG 6 ;
+         LAMBDA
+           (pair (option (pair timestamp nat)) string)
+           (pair timestamp nat)
+           { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         LAMBDA
+           (pair (lambda (pair bool string) unit) (pair timestamp int))
+           unit
+           { UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             PUSH string "P_OLD_PRICE_RECEIVED" ;
+             DIG 2 ;
+             NOW ;
+             SUB ;
+             DIG 2 ;
+             COMPARE ;
+             GE ;
+             PAIR ;
+             EXEC } ;
+         SWAP ;
+         APPLY ;
+         DIG 9 ;
          UNPAIR ;
          PUSH string "DONT_SEND_TEZOS" ;
          PUSH mutez 0 ;
@@ -27,18 +52,21 @@
          COMPARE ;
          EQ ;
          PAIR ;
-         DUP 4 ;
+         DUP 6 ;
          SWAP ;
          EXEC ;
          DROP ;
          IF_LEFT
            { IF_LEFT
-               { DIG 3 ;
+               { DIG 5 ;
                  DROP ;
                  IF_LEFT
-                   { DIG 3 ;
+                   { DIG 2 ;
+                     DIG 3 ;
                      DIG 5 ;
-                     DROP 2 ;
+                     DIG 6 ;
+                     DIG 8 ;
+                     DROP 5 ;
                      DUP 4 ;
                      PUSH nat 1 ;
                      DUP 3 ;
@@ -78,7 +106,7 @@
                      DIG 4 ;
                      DROP 3 ;
                      PAIR }
-                   { DIG 4 ;
+                   { DIG 7 ;
                      DROP ;
                      PUSH string "P_NOT_ORACLE" ;
                      DUP 3 ;
@@ -87,42 +115,59 @@
                      COMPARE ;
                      EQ ;
                      PAIR ;
-                     DUP 4 ;
+                     DIG 5 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     DIG 5 ;
-                     PUSH address "KT1KBrn1udLLrGNbQ3n1mWgMVXkr26krj6Nj" ;
+                     DUP 8 ;
+                     DUP 6 ;
                      PUSH string "XTZ-USD" ;
                      VIEW "getPrice" (pair timestamp nat) ;
-                     IF_NONE { FAILWITH } { SWAP ; DROP } ;
+                     PAIR ;
+                     DUP 5 ;
+                     SWAP ;
+                     EXEC ;
                      DUP 3 ;
                      GET 7 ;
                      SWAP ;
                      DUP ;
                      DUG 2 ;
                      CAR ;
-                     PUSH string "P_OLD_PRICE_RECEIVED" ;
-                     DIG 2 ;
-                     NOW ;
-                     SUB ;
-                     DIG 2 ;
-                     COMPARE ;
-                     GE ;
                      PAIR ;
-                     DIG 4 ;
+                     DUP 5 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     CDR ;
+                     DIG 8 ;
+                     DIG 6 ;
+                     PUSH string "BTC-USD" ;
+                     VIEW "getPrice" (pair timestamp nat) ;
+                     PAIR ;
+                     DIG 5 ;
                      SWAP ;
-                     DUP 3 ;
+                     EXEC ;
+                     DUP 4 ;
+                     GET 7 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     PAIR ;
+                     DIG 5 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     DUP 4 ;
                      GET 5 ;
+                     SWAP ;
+                     CDR ;
                      PUSH nat 1000000000000000000000000000000000000 ;
                      MUL ;
-                     EDIV ;
-                     IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
-                     CAR ;
+                     MUL ;
+                     DUG 2 ;
+                     CDR ;
+                     MUL ;
+                     SWAP ;
                      EDIV ;
                      IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                      CAR ;
@@ -148,8 +193,11 @@
                      TRANSFER_TOKENS ;
                      CONS ;
                      PAIR } }
-               { DIG 7 ;
-                 DROP ;
+               { DIG 2 ;
+                 DIG 3 ;
+                 DIG 6 ;
+                 DIG 10 ;
+                 DROP 4 ;
                  IF_LEFT
                    { DIG 4 ;
                      DIG 5 ;
@@ -216,10 +264,13 @@
                      UPDATE 11 ;
                      SWAP ;
                      PAIR } } }
-           { DIG 4 ;
-             DIG 5 ;
+           { DIG 2 ;
+             DIG 3 ;
+             DIG 6 ;
              DIG 7 ;
-             DROP 3 ;
+             DIG 8 ;
+             DIG 10 ;
+             DROP 6 ;
              DIG 4 ;
              DUP 3 ;
              CAR ;
