@@ -1,10 +1,8 @@
 #include "../../helpers.ligo"
-#define CALLBACK
 #import  "../../partial/parser/errors.ligo" "Errors"
 #include "../../partial/parser/storage.ligo"
 #include "../../partial/parser/helpers.ligo"
 #include "../../partial/parser/methods.ligo"
 #import "../../partial/parser/vendor/harbinger/sirs_lp/constants.ligo" "Constants"
-#include "../../partial/parser/vendor/harbinger/sirs_lp/types.ligo"
 #include "../../partial/parser/vendor/harbinger/sirs_lp/methods.ligo"
 #include "../../partial/parser/main.ligo"

@@ -1,9 +1,7 @@
-[@inline] function getLPTargetContract(
-  const oracleAddress   : address)
-                        : contract(contract(nat)) is
+[@inline] function getLPtzBTCPriceView(const oracleAddress  : address) : nat is
   unwrap(
-    (Tezos.get_entrypoint_opt("%get_price", oracleAddress)
-                        : option(contract(contract(nat)))),
+    (Tezos.call_view("%get_price", Unit, oracleAddress)
+                        : option(nat)),
     Errors.wrongOContract
   )
 
@@ -50,11 +48,30 @@ function getPrice(
                         : list(operation) is
       block {
         require(Big_map.mem(tokenId, s.assetName), Errors.AssetCheck.sirsOnly);
-        const param : contract(nat) = Tezos.self("%receivePrice");
+        // We receive price as (1tzBTC to {price} SIRS) * 1e6
+        const priceLP = getLPtzBTCPriceView(s.oracle);
+        // So, to receive SIRS price to 1XTZ, we need to get prices for XTZ-USD and BTC-USD
+        const tezToUsdPrice : nat = getXTZUSDPriceView(s.timestampLimit);
+        const btcToUsdPrice : nat = getBTCUSDPriceView(s.timestampLimit);
+        // sirsToBTC = oraclePrecision/price (SIRS/BTC)
+        // tezToUSD = tezToUsdPrice/genericOraclePrecision (XTZ/USD)
+        // btcToUSD = btcToUsdPrice/genericOraclePrecision (BTC/USD)
+        // price = precision * ((sirsToBTC * btcToUSD) / tezToUSD)
+        //                      (SIRS/BTC) * (BTC/USD) / (XTZ/USD) = (SIRS/USD) / (XTZ/USD) = SIRS/XTZ
+        // price = precision * (oraclePrecision/price) * (btcToUsdPrice/genericOraclePrecision) / (tezToUsdPrice/genericOraclePrecision)
+        //         precision * (oraclePrecision * btcToUsdPrice / price) / tezToUsdPrice
+        //         precision * btcToUsdPrice * oraclePrecision / (tezToUsdPrice * price)
+        const nominator : nat = precision * btcToUsdPrice * s.oraclePrecision;
+        const denominator : nat = tezToUsdPrice * priceLP;
+        const priceF: precisionValue = nominator / denominator;
+        const tokenId : nat = checkAssetId(Constants.assetName, s.assetId);
         const receivePriceOp = Tezos.transaction(
-          param,
+          record [
+            tokenId = tokenId;
+            priceF = priceF;
+          ],
           0mutez,
-          getLPTargetContract(s.oracle)
+          getRouterPriceCallbackMethod(s.router)
         );
       } with receivePriceOp # operations;
 
@@ -63,38 +80,4 @@ function getPrice(
         tokenSet,
         (nil : list(operation))
       );
-  } with (operations, s)
-
-function receivePrice(
-  const price           : nat;
-  var s                 : parserStorage)
-                        : parserReturn is
-  block {
-    mustBeOracle(s.oracle);
-    const tezToUsdPrice : nat = getXTZUSDPriceView(s.timestampLimit);
-    const btcToUsdPrice : nat = getBTCUSDPriceView(s.timestampLimit);
-    // We receive price as (1tzBTC to {price} SIRS) * 1e6
-    // So, to receive SIRS price to 1XTZ, we need to get prices for XTZ-USD and BTC-USD
-    // sirsToBTC = oraclePrecision/price (SIRS/BTC)
-    // tezToUSD = tezToUsdPrice/genericOraclePrecision (XTZ/USD)
-    // btcToUSD = btcToUsdPrice/genericOraclePrecision (BTC/USD)
-    // price = precision * ((sirsToBTC * btcToUSD) / tezToUSD)
-    //                      (SIRS/BTC) * (BTC/USD) / (XTZ/USD) = (SIRS/USD) / (XTZ/USD) = SIRS/XTZ
-    // price = precision * (oraclePrecision/price) * (btcToUsdPrice/genericOraclePrecision) / (tezToUsdPrice/genericOraclePrecision)
-    //         precision * (oraclePrecision * btcToUsdPrice / price) / tezToUsdPrice
-    //         precision * btcToUsdPrice * oraclePrecision / (tezToUsdPrice * price)
-    const nominator : nat = precision * btcToUsdPrice * s.oraclePrecision;
-    const denominator : nat = tezToUsdPrice * price;
-    const priceF: precisionValue = nominator / denominator;
-    const tokenId : nat = checkAssetId(Constants.assetName, s.assetId);
-    var operations : list(operation) := list[
-      Tezos.transaction(
-        record [
-          tokenId = tokenId;
-          priceF = priceF;
-        ],
-        0mutez,
-        getRouterPriceCallbackMethod(s.router)
-      )
-    ];
   } with (operations, s)
