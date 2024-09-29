@@ -1,7 +1,6 @@
 [@inline] function getLPtzBTCPriceView(const oracleAddress  : address) : nat is
   unwrap(
-    (Tezos.call_view("%get_price", Unit, oracleAddress)
-                        : option(nat)),
+    (Tezos.call_view("get_price", Unit, oracleAddress): option(nat)),
     Errors.wrongOContract
   )
 

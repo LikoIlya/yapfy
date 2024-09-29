@@ -90,7 +90,7 @@
                         DUP 3 ;
                         GET 3 ;
                         UNIT ;
-                        VIEW "%get_price" nat ;
+                        VIEW "get_price" nat ;
                         PAIR ;
                         DUP 6 ;
                         SWAP ;
