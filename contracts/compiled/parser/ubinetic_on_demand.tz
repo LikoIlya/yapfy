@@ -10,22 +10,14 @@
           (big_map %assetName nat string)
           (big_map %assetId string nat)
           (big_map %metadata string bytes)) ;
-  code { PUSH string "P_NOT_ORACLE_CONTRACT" ;
-         PUSH string "P_NOT_ROUTER" ;
-         PUSH string "SIRS_ONLY" ;
-         PUSH string "SIRS" ;
+  code { PUSH string "P_NOT_ROUTER" ;
+         PUSH nat 1000000000000000000000000000000000000 ;
          NIL operation ;
          LAMBDA
            (pair bool string)
            unit
            { UNPAIR ; IF { DROP ; UNIT } { FAILWITH } } ;
-         LAMBDA
-           (pair (option nat) string)
-           nat
-           { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
-         SWAP ;
          DUP ;
-         DUG 2 ;
          LAMBDA
            (pair (lambda (pair bool string) unit) (pair timestamp int))
            unit
@@ -43,7 +35,8 @@
              EXEC } ;
          SWAP ;
          APPLY ;
-         DIG 8 ;
+         PUSH string "XTZUSDT" ;
+         DIG 6 ;
          UNPAIR ;
          PUSH string "DONT_SEND_TEZOS" ;
          PUSH mutez 0 ;
@@ -57,63 +50,49 @@
          DROP ;
          IF_LEFT
            { IF_LEFT
-               { DIG 5 ;
-                 DROP ;
-                 DUP 7 ;
-                 PUSH nat 1 ;
-                 DUP 3 ;
-                 SIZE ;
-                 COMPARE ;
-                 EQ ;
+               { DIG 4 ;
+                 DIG 5 ;
+                 DROP 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 7 ;
+                 DUP 4 ;
+                 DUP 4 ;
+                 GET 3 ;
+                 PUSH string "P_NOT_ORACLE_CONTRACT" ;
+                 SWAP ;
+                 DIG 2 ;
+                 VIEW "get_price_with_timestamp" (pair nat timestamp) ;
+                 IF_NONE { FAILWITH } { SWAP ; DROP } ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
                  PAIR ;
                  DUP 6 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
+                 CAR ;
                  NIL operation ;
-                 SWAP ;
+                 DIG 2 ;
                  ITER { SWAP ;
-                        DUP 8 ;
                         DUP 4 ;
                         GET 9 ;
-                        DIG 3 ;
-                        MEM ;
-                        PAIR ;
-                        DUP 6 ;
-                        SWAP ;
-                        EXEC ;
-                        DROP ;
-                        DUP 9 ;
-                        DUP 3 ;
-                        GET 3 ;
-                        UNIT ;
-                        VIEW "get_price" nat ;
-                        PAIR ;
-                        DUP 5 ;
-                        SWAP ;
-                        EXEC ;
-                        DUP 3 ;
-                        GET 7 ;
-                        PUSH string "XTZUSDT" ;
-                        DUP 12 ;
-                        PUSH address "KT1B74ywpG3nX2F3ZgpYi4MnsyuoYyQtQTAn" ;
                         DIG 2 ;
-                        VIEW "get_price_with_timestamp" (pair nat timestamp) ;
-                        IF_NONE { FAILWITH } { SWAP ; DROP } ;
-                        DUP ;
+                        PUSH string "STRING_NOT_DEFINED" ;
                         DUG 2 ;
-                        CDR ;
-                        PAIR ;
-                        DUP 6 ;
-                        SWAP ;
-                        EXEC ;
-                        DROP ;
-                        CAR ;
+                        GET ;
+                        IF_NONE { FAILWITH } { SWAP ; DROP } ;
                         DUP 4 ;
                         GET 7 ;
-                        PUSH string "BTCUSDT" ;
-                        DUP 13 ;
-                        PUSH address "KT1B74ywpG3nX2F3ZgpYi4MnsyuoYyQtQTAn" ;
+                        SWAP ;
+                        DUP ;
+                        DUG 2 ;
+                        DUP 6 ;
+                        GET 3 ;
+                        PUSH string "P_NOT_ORACLE_CONTRACT" ;
+                        SWAP ;
                         DIG 2 ;
                         VIEW "get_price_with_timestamp" (pair nat timestamp) ;
                         IF_NONE { FAILWITH } { SWAP ; DROP } ;
@@ -121,35 +100,38 @@
                         DUG 2 ;
                         CDR ;
                         PAIR ;
-                        DUP 7 ;
+                        DUP 8 ;
                         SWAP ;
                         EXEC ;
                         DROP ;
                         CAR ;
-                        DUP 5 ;
-                        GET 5 ;
-                        SWAP ;
-                        PUSH nat 1000000000000000000000000000000000000 ;
-                        MUL ;
-                        MUL ;
-                        DUG 2 ;
-                        MUL ;
-                        SWAP ;
-                        EDIV ;
-                        IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
-                        CAR ;
+                        DUP 6 ;
                         DUP 3 ;
+                        COMPARE ;
+                        EQ ;
+                        IF { DUP 8 ;
+                             DUP 6 ;
+                             GET 5 ;
+                             MUL ;
+                             EDIV ;
+                             IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                             CAR }
+                           { DUP 4 ;
+                             DUP 9 ;
+                             DIG 2 ;
+                             MUL ;
+                             EDIV ;
+                             IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                             CAR } ;
+                        DUP 5 ;
                         GET 11 ;
-                        DUP 8 ;
+                        DIG 2 ;
                         PUSH string "TOKEN_ID_NOT_DEFINED" ;
                         DUG 2 ;
                         GET ;
-                        PAIR ;
+                        IF_NONE { FAILWITH } { SWAP ; DROP } ;
+                        DUP 9 ;
                         DUP 6 ;
-                        SWAP ;
-                        EXEC ;
-                        DUP 10 ;
-                        DUP 5 ;
                         CAR ;
                         CONTRACT %receivePrice (pair (nat %tokenId) (nat %priceF)) ;
                         IF_NONE { FAILWITH } { SWAP ; DROP } ;
@@ -159,21 +141,17 @@
                         PAIR ;
                         TRANSFER_TOKENS ;
                         CONS } ;
-                 DIG 2 ;
+                 SWAP ;
                  DIG 3 ;
                  DIG 4 ;
                  DIG 5 ;
                  DIG 6 ;
-                 DIG 7 ;
-                 DIG 8 ;
-                 DROP 7 ;
+                 DROP 5 ;
                  PAIR }
                { DIG 2 ;
                  DIG 3 ;
                  DIG 6 ;
-                 DIG 7 ;
-                 DIG 9 ;
-                 DROP 5 ;
+                 DROP 3 ;
                  DIG 4 ;
                  DUP 3 ;
                  CAR ;
@@ -191,24 +169,13 @@
                  PAIR } }
            { DIG 2 ;
              DIG 3 ;
-             DIG 9 ;
+             DIG 6 ;
              DROP 3 ;
              IF_LEFT
-               { DIG 6 ;
+               { DIG 4 ;
                  DUP 3 ;
                  CAR ;
                  SENDER ;
-                 COMPARE ;
-                 EQ ;
-                 PAIR ;
-                 DUP 4 ;
-                 SWAP ;
-                 EXEC ;
-                 DROP ;
-                 DIG 5 ;
-                 DIG 5 ;
-                 DUP 3 ;
-                 CAR ;
                  COMPARE ;
                  EQ ;
                  PAIR ;
@@ -242,9 +209,6 @@
                  SWAP ;
                  PAIR }
                { DIG 4 ;
-                 DIG 5 ;
-                 DROP 2 ;
-                 DIG 4 ;
                  DUP 3 ;
                  CAR ;
                  SENDER ;

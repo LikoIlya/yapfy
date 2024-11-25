@@ -3,6 +3,6 @@
 #include "../../partial/parser/storage.ligo"
 #include "../../partial/parser/helpers.ligo"
 #include "../../partial/parser/methods.ligo"
-#import "../../partial/parser/vendor/ubinetic/sirs_lp/constants.ligo" "Constants"
-#include "../../partial/parser/vendor/ubinetic/sirs_lp/methods.ligo"
+#include "../../partial/parser/vendor/ubinetic/on_demand/constants.ligo"
+#include "../../partial/parser/vendor/ubinetic/on_demand/methods.ligo"
 #include "../../partial/parser/main.ligo"

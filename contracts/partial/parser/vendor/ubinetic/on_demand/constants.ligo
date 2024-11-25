@@ -1,0 +1,1 @@
+const xtz_usd_price_name = "XTZUSDT";

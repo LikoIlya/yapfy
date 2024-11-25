@@ -53,7 +53,7 @@
     "compile-contract": "yarn cli compile -F json",
     "compile-parser": "./scripts/compileParser.sh",
     "parser-to-bytes": "./scripts/parserToBytes.sh",
-    "compile-all": "yarn compile --contract router && yarn parser-to-bytes harbinger && yarn parser-to-bytes ubinetic && yarn parser-to-bytes ubinetic_old && yarn parser-to-bytes ctez && yarn parser-to-bytes wtez && yarn parser-to-bytes sirs_lp && yarn parser-to-bytes uxtz",
+    "compile-all": "yarn compile --contract router && yarn parser-to-bytes harbinger && yarn parser-to-bytes ubinetic && yarn parser-to-bytes ubinetic_old && yarn parser-to-bytes ubinetic_on_demand && yarn parser-to-bytes ctez && yarn parser-to-bytes wtez && yarn parser-to-bytes sirs_lp && yarn parser-to-bytes uxtz",
     "test": "jest"
   }
 }

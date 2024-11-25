@@ -10,11 +10,11 @@ if [ "$PARSER" = "ctez" ]; then
 fi
 if [ "$PARSER" = "sirs_lp" ]; then
   set -o allexport
-  if [ ! "$HARBINGER_ORACLE" ]; then
+  if [ ! "$UBINETIC_ON_DEMAND_ORACLE" ]; then
     [ -f .env ] && . .env
   fi
-  HARBINGER_ORACLE=${HARBINGER_ORACLE:-"tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg"}
-  sed -i.bak "s/{env.HARBINGER_ORACLE}/$HARBINGER_ORACLE/gi" ./contracts/partial/parser/vendor/harbinger/sirs_lp/constants.ligo
+  UBINETIC_ON_DEMAND_ORACLE=${UBINETIC_ON_DEMAND_ORACLE:-"tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg"}
+  sed -i.bak "s/{env.UBINETIC_ON_DEMAND_ORACLE}/$UBINETIC_ON_DEMAND_ORACLE/gi" ./contracts/partial/parser/vendor/ubinetic/sirs_lp/constants.ligo
 fi
 yarn cli compile -F tz -c parser/$PARSER
 if [ "$PARSER" = "ctez" ]; then
@@ -22,7 +22,7 @@ if [ "$PARSER" = "ctez" ]; then
   set +o allexport
 fi
 if [ "$PARSER" = "sirs_lp" ]; then
-  mv ./contracts/partial/parser/vendor/harbinger/sirs_lp/constants.ligo.bak ./contracts/partial/parser/vendor/harbinger/sirs_lp/constants.ligo
+  mv ./contracts/partial/parser/vendor/ubinetic/sirs_lp/constants.ligo.bak ./contracts/partial/parser/vendor/ubinetic/sirs_lp/constants.ligo
   set +o allexport
 fi
 
