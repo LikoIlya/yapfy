@@ -23,15 +23,24 @@
            (pair (option nat) string)
            nat
            { UNPAIR ; IF_NONE { FAILWITH } { SWAP ; DROP } } ;
-         SWAP ;
-         DUP ;
-         DUG 2 ;
+         DUP 7 ;
+         DUP 3 ;
+         PAIR ;
          LAMBDA
-           (pair (lambda (pair bool string) unit) (pair timestamp int))
-           unit
+           (pair (pair (lambda (pair bool string) unit) string) (pair string int))
+           nat
            { UNPAIR ;
-             SWAP ;
              UNPAIR ;
+             DIG 2 ;
+             UNPAIR ;
+             DIG 3 ;
+             PUSH address "KT1B74ywpG3nX2F3ZgpYi4MnsyuoYyQtQTAn" ;
+             DIG 2 ;
+             VIEW "get_price_with_timestamp" (pair nat timestamp) ;
+             IF_NONE { FAILWITH } { SWAP ; DROP } ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
              PUSH string "P_OLD_PRICE_RECEIVED" ;
              DIG 2 ;
              NOW ;
@@ -40,7 +49,11 @@
              COMPARE ;
              GE ;
              PAIR ;
-             EXEC } ;
+             DIG 2 ;
+             SWAP ;
+             EXEC ;
+             DROP ;
+             CAR } ;
          SWAP ;
          APPLY ;
          DIG 8 ;
@@ -95,37 +108,17 @@
                         DUP 3 ;
                         GET 7 ;
                         PUSH string "XTZUSDT" ;
-                        DUP 12 ;
-                        PUSH address "KT1B74ywpG3nX2F3ZgpYi4MnsyuoYyQtQTAn" ;
-                        DIG 2 ;
-                        VIEW "get_price_with_timestamp" (pair nat timestamp) ;
-                        IF_NONE { FAILWITH } { SWAP ; DROP } ;
-                        DUP ;
-                        DUG 2 ;
-                        CDR ;
+                        PAIR ;
+                        DUP 5 ;
+                        SWAP ;
+                        EXEC ;
+                        DUP 4 ;
+                        GET 7 ;
+                        PUSH string "BTCUSDT" ;
                         PAIR ;
                         DUP 6 ;
                         SWAP ;
                         EXEC ;
-                        DROP ;
-                        CAR ;
-                        DUP 4 ;
-                        GET 7 ;
-                        PUSH string "BTCUSDT" ;
-                        DUP 13 ;
-                        PUSH address "KT1B74ywpG3nX2F3ZgpYi4MnsyuoYyQtQTAn" ;
-                        DIG 2 ;
-                        VIEW "get_price_with_timestamp" (pair nat timestamp) ;
-                        IF_NONE { FAILWITH } { SWAP ; DROP } ;
-                        DUP ;
-                        DUG 2 ;
-                        CDR ;
-                        PAIR ;
-                        DUP 7 ;
-                        SWAP ;
-                        EXEC ;
-                        DROP ;
-                        CAR ;
                         DUP 5 ;
                         GET 5 ;
                         SWAP ;

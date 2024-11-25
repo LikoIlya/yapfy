@@ -4,7 +4,7 @@
     Errors.wrongOContract
   )
 
-[@inline] function getGenericOraclePriceView(
+function getGenericOraclePriceView(
     const asset           : string;
     const timestampLimit  : int)
                           : nat is
