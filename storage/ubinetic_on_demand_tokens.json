@@ -1,0 +1,10 @@
+{
+  "13": {
+    "name": "BTCUSDT",
+    "decimals": "100000000"
+  },
+  "14": {
+    "name": "XTZUSDT",
+    "decimals": "1000000"
+  }
+}
