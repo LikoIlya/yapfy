@@ -1,3 +1,12 @@
+function checkTimestamp(
+  const oracleTimestamp : timestamp;
+  const limit           : int)
+                        : unit is 
+  block {
+    const zeroTimestamp : timestamp = (0: timestamp);
+    const oracleTimestampWoMillisecons : timestamp = ((oracleTimestamp - zeroTimestamp) / 1000) + zeroTimestamp;
+  } with require(oracleTimestampWoMillisecons >= Tezos.now - limit, Errors.timestampLimit);
+
 [@inline] function getLPtzBTCPriceView(const oracleAddress  : address) : nat is
   unwrap(
     (Tezos.call_view("get_price", Unit, oracleAddress): option(nat)),

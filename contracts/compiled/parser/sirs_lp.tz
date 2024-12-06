@@ -41,6 +41,16 @@
              DUP ;
              DUG 2 ;
              CDR ;
+             PUSH timestamp 0 ;
+             DUP ;
+             PUSH int 1000 ;
+             DIG 2 ;
+             DIG 3 ;
+             SUB ;
+             EDIV ;
+             IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+             CAR ;
+             ADD ;
              PUSH string "P_OLD_PRICE_RECEIVED" ;
              DIG 2 ;
              NOW ;

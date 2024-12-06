@@ -25,7 +25,7 @@ function getPrice(
         const priceF : precisionValue = if (usd)  // then this is the USD-peg and we should
           then s.oraclePrecision * precision / oraclePrice // invert to USD/XTZ (1/priceF)
           else oraclePrice * precision / tezToUsdPrice; // else divide by XTZ/USD price to send XTZ-related price
-        const tokenId : nat = checkAssetId(strName, s.assetId);
+        // const tokenId : nat = checkAssetId(strName, s.assetId);
         var op : operation := Tezos.transaction(
           record [
             tokenId = tokenId;

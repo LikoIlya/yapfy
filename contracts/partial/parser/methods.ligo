@@ -25,5 +25,5 @@ function updateAsset(
   block {
     mustBeRouter(s.router);
     s.assetName[param.tokenId] := param.assetName;
-    s.assetId[param.assetName] := param.tokenId;
+    // s.assetId[param.assetName] := param.tokenId;
   } with s

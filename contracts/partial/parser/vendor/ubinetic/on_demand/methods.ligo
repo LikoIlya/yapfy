@@ -1,3 +1,14 @@
+function checkTimestamp(
+  const oracleTimestamp : timestamp;
+  const limit           : int)
+                        : unit is 
+  block {
+    const zeroTimestamp : timestamp = (0: timestamp);
+    const oracleTimestampWoMillisecons : timestamp = ((oracleTimestamp - zeroTimestamp) / 1000) + zeroTimestamp;
+  } with require(oracleTimestampWoMillisecons >= Tezos.now - limit, Errors.timestampLimit);
+  
+
+
 [@inline] function getOraclePriceView(
     const oracleAddress   : address;
     const asset           : string;
@@ -32,7 +43,7 @@ function getPrice(
         const priceF : precisionValue = if (usd)  // then this is the USD-peg and we should
           then s.oraclePrecision * precision / oraclePrice // invert to USD/XTZ (1/priceF)
           else oraclePrice * precision / tezToUsdPrice; // else divide by XTZ/USD price to send XTZ-related price
-        const tokenId : nat = checkAssetId(strName, s.assetId);
+        // const tokenId : nat = checkAssetId(strName, s.assetId);
         var op : operation := Tezos.transaction(
           record [
             tokenId = tokenId;
